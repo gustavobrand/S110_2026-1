@@ -1,0 +1,46 @@
+  404  docker volume create redis_data
+  405  docker volume ls
+  406  docker volume inspect redis_data 
+  407  docker stop redis 
+  408  clear
+  410  docker container rm redis 
+  411   docker container run -d --name redis -v redis_data:/data --network moby
+  412   docker container run -d --name redis -v redis_data:/data --network moby
+  413   docker container run -d --name redis -v redis_data:/data --network moby-counter redis:alpine
+  414  clear
+  415  docker ps
+  416  docker exec redis ls /
+  417  docker exec redis ls -l
+  418  docker exec redis ls -l /
+  419  docker exec redis ls -l /data
+  420  docker volume inspect redis_data 
+  421  ls /var/lib/docker/volumes/redis_data/_data
+  422  sudo ls -l /var/lib/docker/volumes/redis_data/_data
+  423  sudo echo "teste" > /var/lib/docker/volumes/redis_data/_data/abc.txt
+  424  sudo touch /var/lib/docker/volumes/redis_data/_data/abc.txt
+  425  sudo ls -l /var/lib/docker/volumes/redis_data/_data
+  426  docker exec redis ls -l /data
+  427  docker exec redis touch /data/xyz.txt
+  428  docker exec redis ls -l /data
+  429  sudo ls -l /var/lib/docker/volumes/redis_data/_data
+  430  docker ps
+  431  docker stop redis 
+  432  ls
+  433  mkdir exemplovolume
+  434  ls
+  435  pwd
+  436  ls /home/ubuntu/environment/S110_2026-1/exemplovolume/
+  437  clear
+  438  ls /home/ubuntu/environment/S110_2026-1/exemplovolume/
+  439  #docker container run -d --name redis -v redis_data:/data --network moby-counter redis:alpine
+  440  docker container run -d --name redis -v /home/ubuntu/environment/S110_2026-1/exemplovolume:/data --network moby-counter redis:alpine
+  441  docker container rm redis
+  442  docker container run -d --name redis -v /home/ubuntu/environment/S110_2026-1/exemplovolume:/data --network moby-counter redis:alpine
+  443  docker exec redis ls -l /data
+  444  ls exemplovolume/
+  445  touch exemplovolume/abc.txt
+  446  ls exemplovolume/
+  447  docker exec redis ls -l /data
+  448  docker exec redis touch /data/xyz.txt
+  449  docker exec redis ls /data
+  450  ls exemplovolume/
