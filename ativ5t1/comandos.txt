@@ -1,0 +1,8 @@
+
+git clone https://github.com/s085sem201802/aula-com-docker-e-git-montando-um-ambiente-gustavobrand.git
+mv  aula-com-docker-e-git-montando-um-ambiente-gustavobrand jogotetris
+cd jogotetris/
+mv inde.html index.html 
+docker build -t ativ05t1v2 .
+docker network create ativ05
+docker run -d -i -p 8080:80 --name ativ05t1v2 -v /home/ubuntu/environment/S110_2026-1/ativ5t1/jogotetris:/var/www/localhost/htdocs --network ativ05 ativ05t1v2:latest 
