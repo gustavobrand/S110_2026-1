@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vote
+  namespace: voteapp
+spec:
+  replicas: 1          # HPA vai controlar; começamos com 1
+  selector:
+    matchLabels:
+      app: vote
+  template:
+    metadata:
+      labels:
+        app: vote
+    spec:
+      containers:
+      - name: vote
+        image: dockersamples/examplevotingapp_vote
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"    # 0.1 vCPU — base para o HPA calcular %
+            memory: "64Mi"
+          limits:
+            cpu: "300m"    # máximo 0.3 vCPU por pod
+            memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vote
+  namespace: voteapp
+spec:
+  # type: NodePort
+  type: ClusterIP
+  selector:
+    app: vote
+  ports:
+  - port: 80
+    targetPort: 80
+    # nodePort: 30000    # mapeado para localhost:8080 no k3d
