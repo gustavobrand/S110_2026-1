@@ -1,0 +1,35 @@
+Passo a passo S110 no k3d:
+
+sudo service apache2 stop  
+
+k3d cluster create voteapp \
+  --servers 1 \
+  --agents 2 \
+  --port 80:80@loadbalancer \
+  --port 443:443@loadbalancer
+
+# esses dois comandos somente depois de ter feito o docker build 
+# a partir do repo voteapplication
+k3d image import voteapp-vote:v1 -c voteapp
+k3d image import voteapp-vote:v2 -c voteapp
+
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/postgres-secret.yaml
+kubectl apply -f k8s/redis-deployment.yaml
+kubectl apply -f k8s/postgres-deployment.yaml
+kubectl apply -f k8s/worker-deployment.yaml
+kubectl apply -f k8s/vote-deployment.yaml
+kubectl apply -f k8s/result-deployment.yaml
+kubectl apply -f k8s/vote-hpa.yaml
+kubectl apply -f k8s/ingress.yaml
+
+kubectl create namespace monitoring
+
+helm install kube-prometheus-stack \
+  prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --set grafana.adminPassword=admin123 \
+  --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
+  --set alertmanager.enabled=false
+
+kubectl apply -f k8s/servicemonitor.yaml
