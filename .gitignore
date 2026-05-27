@@ -1,0 +1,6 @@
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars          # se contiver segredos
+*.tfvars.json
