@@ -4,7 +4,12 @@ metadata:
   name: vote
   namespace: voteapp
 spec:
-  replicas: 1          # HPA vai controlar; começamos com 1
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # cria 1 pod novo antes de remover antigo
+      maxUnavailable: 0  # zero pods indisponíveis durante o update
   selector:
     matchLabels:
       app: vote
@@ -15,15 +20,22 @@ spec:
     spec:
       containers:
       - name: vote
-        image: dockersamples/examplevotingapp_vote
+        image: voteapp-vote:v1   # imagem com tag explícita
+        # image: dockersamples/examplevotingapp_vote
         ports:
         - containerPort: 80
+        readinessProbe:         # k8s só roteia tráfego quando pronto
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
         resources:
           requests:
-            cpu: "100m"    # 0.1 vCPU — base para o HPA calcular %
+            cpu: "100m"
             memory: "64Mi"
           limits:
-            cpu: "300m"    # máximo 0.3 vCPU por pod
+            cpu: "300m"
             memory: "128Mi"
 ---
 apiVersion: v1
