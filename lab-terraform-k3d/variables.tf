@@ -11,6 +11,25 @@ variable "agent_count" {
   description = "Número de nós agents no cluster"
 }
 
+variable "k3s_image" {
+  type        = string
+  default     = "rancher/k3s:v1.29.6-k3s2"
+  description = "Imagem k3s usada pelo k3d para evitar incompatibilidades de runtime"
+}
+
+variable "create_namespaces" {
+  type        = bool
+  default     = false
+  description = "Cria namespaces Kubernetes somente após o cluster/kubeconfig estar pronto"
+}
+
+variable "kubeconfig_context" {
+  type        = string
+  default     = null
+  nullable    = true
+  description = "Contexto do kubeconfig (ex.: k3d-voteapp). Use null na primeira execução"
+}
+
 # ── Postgres ────────────────────────────────────────────────
 variable "postgres_db" {
   type        = string
