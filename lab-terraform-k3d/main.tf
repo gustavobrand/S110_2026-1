@@ -50,6 +50,6 @@ resource "k3d_cluster" "voteapp" {
 }
 
 provider "kubernetes" {
-  config_path    = "/home/codespace/.kube/config"
+  config_path    = "~/.kube/config"
   config_context = var.kubeconfig_context
 }

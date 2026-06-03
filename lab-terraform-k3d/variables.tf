@@ -7,7 +7,7 @@ variable "cluster_name" {
 
 variable "agent_count" {
   type        = number
-  default     = 1
+  default     = 2
   description = "Número de nós agents no cluster"
 }
 
