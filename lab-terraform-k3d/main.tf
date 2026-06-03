@@ -49,7 +49,17 @@ resource "k3d_cluster" "voteapp" {
   }
 }
 
+locals {
+  kubeconfig_path              = pathexpand("~/.kube/config")
+  effective_kubeconfig_context = coalesce(var.kubeconfig_context, "k3d-${var.cluster_name}")
+  kubeconfig_exists            = fileexists(local.kubeconfig_path)
+  kubeconfig_context_names = local.kubeconfig_exists ? [
+    for c in coalesce(try(yamldecode(file(local.kubeconfig_path)).contexts, []), []) : c.name
+  ] : []
+  kubeconfig_context_exists = contains(local.kubeconfig_context_names, local.effective_kubeconfig_context)
+}
+
 provider "kubernetes" {
-  config_path    = "~/.kube/config"
-  config_context = var.kubeconfig_context
+  config_path    = local.kubeconfig_path
+  config_context = local.kubeconfig_context_exists ? local.effective_kubeconfig_context : null
 }

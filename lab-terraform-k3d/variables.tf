@@ -19,15 +19,15 @@ variable "k3s_image" {
 
 variable "create_namespaces" {
   type        = bool
-  default     = false
-  description = "Cria namespaces Kubernetes somente após o cluster/kubeconfig estar pronto"
+  default     = true
+  description = "Cria namespaces Kubernetes quando o contexto estiver presente no kubeconfig"
 }
 
 variable "kubeconfig_context" {
   type        = string
   default     = null
   nullable    = true
-  description = "Contexto do kubeconfig (ex.: k3d-voteapp). Use null na primeira execução"
+  description = "Contexto do kubeconfig (ex.: k3d-voteapp). Se null, usa automaticamente k3d-<cluster_name>"
 }
 
 # ── Postgres ────────────────────────────────────────────────

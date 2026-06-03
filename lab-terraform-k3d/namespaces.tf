@@ -1,5 +1,5 @@
 resource "kubernetes_namespace" "voteapp" {
-  count = var.create_namespaces ? 1 : 0
+  count = var.create_namespaces && local.kubeconfig_context_exists ? 1 : 0
 
   metadata {
     name = "voteapp"
@@ -12,7 +12,7 @@ resource "kubernetes_namespace" "voteapp" {
 }
 
 resource "kubernetes_namespace" "monitoring" {
-  count = var.create_namespaces ? 1 : 0
+  count = var.create_namespaces && local.kubeconfig_context_exists ? 1 : 0
 
   metadata {
     name = "monitoring"
