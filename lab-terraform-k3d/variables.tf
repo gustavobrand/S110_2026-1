@@ -27,7 +27,7 @@ variable "kubeconfig_context" {
   type        = string
   default     = null
   nullable    = true
-  description = "Contexto do kubeconfig (ex.: k3d-voteapp). Se null, usa automaticamente k3d-<cluster_name>"
+  description = "Legado: contexto do kubeconfig (nao usado na configuracao atual do provider kubernetes)"
 }
 
 # ── Postgres ────────────────────────────────────────────────
