@@ -19,13 +19,6 @@ resource "k3d_cluster" "voteapp" {
   agents  = var.agent_count
   image   = var.k3s_image
 
-  k3s {
-    extra_args {
-      arg          = "--disable=servicelb"
-      node_filters = ["server:*"]
-    }
-  }
-
   kubeconfig {
     update_default_kubeconfig = true
     switch_current_context    = true
