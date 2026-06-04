@@ -9,6 +9,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.0"
+    }
   }
 }
 
@@ -38,6 +42,17 @@ resource "k3d_cluster" "voteapp" {
 }
 
 provider "kubernetes" {
-  config_path    = pathexpand("~/.kube/config")
-  config_context = coalesce(var.kubeconfig_context, "k3d-${var.cluster_name}")
+  host                   = k3d_cluster.voteapp.credentials[0].host
+  client_certificate     = k3d_cluster.voteapp.credentials[0].client_certificate
+  client_key             = k3d_cluster.voteapp.credentials[0].client_key
+  cluster_ca_certificate = k3d_cluster.voteapp.credentials[0].cluster_ca_certificate
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = k3d_cluster.voteapp.credentials[0].host
+    client_certificate     = k3d_cluster.voteapp.credentials[0].client_certificate
+    client_key             = k3d_cluster.voteapp.credentials[0].client_key
+    cluster_ca_certificate = k3d_cluster.voteapp.credentials[0].cluster_ca_certificate
+  }
 }
