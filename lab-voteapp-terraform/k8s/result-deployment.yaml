@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result
+  namespace: voteapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: result
+  template:
+    metadata:
+      labels:
+        app: result
+    spec:
+      containers:
+      - name: result
+        image: dockersamples/examplevotingapp_result
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: result
+  namespace: voteapp
+spec:
+  # type: NodePort
+  type: ClusterIP
+  selector:
+    app: result
+  ports:
+  - port: 80
+    targetPort: 80
+    # nodePort: 30001    # mapeado para localhost:8081 no k3d
