@@ -3,16 +3,16 @@ name: Terraform
 on:
   push:
     branches: [main]
-    paths: ['infra/**']
+    paths: ['lab-voteapp-terraform/infra/**']
   pull_request:
-    paths: ['infra/**']
+    paths: ['lab-voteapp-terraform/infra/**']
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: infra/
+        working-directory: lab-voteapp-terraform/infra/
 
     steps:
     - uses: actions/checkout@v4
