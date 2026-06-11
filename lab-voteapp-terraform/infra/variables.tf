@@ -1,4 +1,3 @@
-# ── Cluster ────────────────────────────────────────────────
 variable "cluster_name" {
   type        = string
   default     = "voteapp"
@@ -30,7 +29,6 @@ variable "kubeconfig_context" {
   description = "Contexto do kubeconfig (ex.: k3d-voteapp). Se null, usa k3d-<cluster_name>"
 }
 
-# ── Postgres ────────────────────────────────────────────────
 variable "postgres_db" {
   type        = string
   default     = "db"
@@ -62,7 +60,6 @@ variable "postgres_storage_class" {
   description = "StorageClass usada pelo PVC do Postgres (null = classe padrao do cluster)"
 }
 
-# ── Aplicação ───────────────────────────────────────────────
 variable "vote_replicas" {
   type        = number
   default     = 2
@@ -87,7 +84,6 @@ variable "worker_image" {
   description = "Imagem Docker do worker"
 }
 
-# ── Monitoramento ───────────────────────────────────────────
 variable "grafana_password" {
   type        = string
   default     = "admin123"
