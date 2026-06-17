@@ -1,0 +1,867 @@
+
+<h2 class="sr-only">Plano de 4 aulas de observabilidade para disciplina de infraestrutura ágil, cobrindo métricas, logs, traces e troubleshooting</h2>
+<style>
+.wrap { max-width: 860px; padding: 1rem 0 2rem; }
+.mod-nav { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.mod-btn { font-family: var(--font-sans); font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.mod-btn:hover { background: var(--color-background-secondary); }
+.mod-btn.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+.steps-nav { display: flex; gap: 0; margin-bottom: 1.5rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+.step-btn { flex: 1; padding: 9px 4px; font-size: 11px; font-family: var(--font-sans); font-weight: 500; background: var(--color-background-primary); color: var(--color-text-tertiary); border: none; border-right: 0.5px solid var(--color-border-tertiary); cursor: pointer; }
+.step-btn:last-child { border-right: none; }
+.step-btn:hover { background: var(--color-background-secondary); }
+.step-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.step-btn.done { color: #1D9E75; }
+.step-btn .snum { display: block; font-size: 15px; font-weight: 500; margin-bottom: 2px; }
+.mod-panel { display: none; }
+.mod-panel.active { display: block; }
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+.panel-title { font-family: var(--font-sans); font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+.panel-sub { font-family: var(--font-sans); font-size: 13px; color: var(--color-text-secondary); margin: 0 0 1.4rem; line-height: 1.6; }
+.slabel { font-family: var(--font-sans); font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.07em; margin: 1.4rem 0 7px; }
+.concept { background: var(--color-background-secondary); border-left: 3px solid #7F77DD; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 11px 15px; margin-bottom: 1.2rem; font-family: var(--font-sans); font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.concept strong { color: var(--color-text-primary); font-weight: 500; }
+.concept.green { border-left-color: #1D9E75; }
+.concept.amber { border-left-color: #BA7517; }
+.concept.coral { border-left-color: #D85A30; }
+.concept.blue { border-left-color: #378ADD; }
+.cmd-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); margin-bottom: 10px; overflow: hidden; }
+.cmd-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.cmd-label { font-family: var(--font-sans); font-size: 11px; color: var(--color-text-tertiary); }
+.copy-btn { font-family: var(--font-sans); font-size: 11px; color: var(--color-text-secondary); background: none; border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+.copy-btn:hover { background: var(--color-background-primary); }
+.cmd-body { padding: 10px 14px; font-size: 12px; line-height: 1.75; color: var(--color-text-primary); white-space: pre; overflow-x: auto; font-family: var(--font-mono, monospace); }
+.cmd-body .c { color: var(--color-text-tertiary); }
+.cmd-body .hl { color: #1D9E75; }
+.cmd-body .warn { color: #BA7517; }
+.cmd-body .k { color: #7F77DD; }
+.cmd-body .v { color: #1D9E75; }
+.cmd-body .s { color: #D85A30; }
+.verify { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px 16px; margin-top: 1rem; font-family: var(--font-sans); }
+.verify-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 8px; }
+.verify ul { margin: 0; padding-left: 1.1rem; font-size: 13px; color: var(--color-text-secondary); line-height: 1.8; }
+.verify ul li::marker { color: #1D9E75; }
+.nav-row { display: flex; justify-content: space-between; margin-top: 1.8rem; }
+.nav-btn { font-family: var(--font-sans); font-size: 13px; padding: 8px 18px; border-radius: var(--border-radius-md); cursor: pointer; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); }
+.nav-btn:hover { background: var(--color-background-secondary); }
+.nav-btn.primary { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+.mod-badge { display: inline-block; font-family: var(--font-sans); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+.mb-1 { background: #EEEDFE; color: #534AB7; }
+.mb-2 { background: #FAEEDA; color: #854F0B; }
+.mb-3 { background: #E1F5EE; color: #0F6E56; }
+.mb-4 { background: #FAECE7; color: #993C1D; }
+
+/* pillar cards */
+.pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 1.2rem 0; }
+.pillar { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px; font-family: var(--font-sans); }
+.pillar-icon { font-size: 22px; margin-bottom: 8px; }
+.pillar-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.pillar-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 8px; }
+.pillar-tool { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 12px; display: inline-block; }
+.pt-purple { background: #EEEDFE; color: #534AB7; }
+.pt-amber { background: #FAEEDA; color: #854F0B; }
+.pt-teal { background: #E1F5EE; color: #0F6E56; }
+
+/* aula cards */
+.aulas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 1rem 0; }
+.aula-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px; font-family: var(--font-sans); }
+.aula-num { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 4px; }
+.aula-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+.aula-items { font-size: 12px; color: var(--color-text-secondary); line-height: 1.8; padding-left: 1rem; margin: 0; }
+.aula-tag { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 10px; display: inline-block; margin-top: 8px; }
+.at-lab { background: #E1F5EE; color: #0F6E56; }
+.at-teoria { background: #E6F1FB; color: #185FA5; }
+.at-desafio { background: #FAECE7; color: #993C1D; }
+</style>
+
+<div class="wrap">
+<div class="mod-nav">
+  <button class="mod-btn active" onclick="goMod(0)">00 · Visão geral</button>
+  <button class="mod-btn" onclick="goMod(1)">01 · Métricas (Prometheus)</button>
+  <button class="mod-btn" onclick="goMod(2)">02 · Logs (Loki)</button>
+  <button class="mod-btn" onclick="goMod(3)">03 · Traces (Jaeger)</button>
+  <button class="mod-btn" onclick="goMod(4)">04 · Troubleshooting</button>
+</div>
+
+<!-- ══ MODULE 0: VISÃO GERAL ══ -->
+<div class="mod-panel active" id="mod0">
+  <div class="steps-nav" id="nav-m0">
+    <button class="step-btn active" onclick="goStep(0,0)"><span class="snum">1</span>Os 3 pilares</button>
+    <button class="step-btn" onclick="goStep(0,1)"><span class="snum">2</span>Plano de aulas</button>
+    <button class="step-btn" onclick="goStep(0,2)"><span class="snum">3</span>Stack escolhida</button>
+  </div>
+
+  <div class="step-panel active" id="m0s0">
+    <span class="mod-badge mb-1">Visão geral</span>
+    <p class="panel-title">Observabilidade: os 3 pilares</p>
+    <p class="panel-sub">Observabilidade é a capacidade de entender o estado interno de um sistema a partir de suas saídas externas. No contexto do voteapp em Kubernetes, isso significa responder: <em>o que está acontecendo, onde está falhando, e por quê?</em></p>
+    <div class="pillars">
+      <div class="pillar">
+        <div class="pillar-icon">📊</div>
+        <div class="pillar-name">Métricas</div>
+        <div class="pillar-desc">Números ao longo do tempo. CPU, memória, requisições/s, latência, erros. Respondem "o quê está errado".</div>
+        <span class="pillar-tool pt-purple">Prometheus + Grafana</span>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">📋</div>
+        <div class="pillar-name">Logs</div>
+        <div class="pillar-desc">Eventos discretos com contexto. Mensagens de erro, stack traces, eventos de negócio. Respondem "o que aconteceu".</div>
+        <span class="pillar-tool pt-amber">Loki + Grafana</span>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">🔍</div>
+        <div class="pillar-name">Traces</div>
+        <div class="pillar-desc">Rastreamento de uma requisição através de múltiplos serviços. Respondem "onde está o gargalo".</div>
+        <span class="pillar-tool pt-teal">Jaeger + OpenTelemetry</span>
+      </div>
+    </div>
+    <div class="concept blue">
+      <strong>Conexão com o que já foi visto.</strong> No roteiro de evolução do k8s, os alunos instalaram Prometheus e Grafana. Métricas já estão no ar. Agora vamos completar os outros dois pilares — logs centralizados com Loki e traces distribuídos com Jaeger — e juntar tudo num cenário real de troubleshooting.
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(0,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m0s1">
+    <span class="mod-badge mb-1">Visão geral</span>
+    <p class="panel-title">Plano das 4 aulas</p>
+    <div class="aulas">
+      <div class="aula-card">
+        <div class="aula-num">Aula 1</div>
+        <div class="aula-title">Métricas avançadas com Prometheus</div>
+        <ul class="aula-items">
+          <li>PromQL além do básico</li>
+          <li>Alertas com Alertmanager</li>
+          <li>Dashboard customizado no Grafana</li>
+          <li>Métricas de negócio (votos/min)</li>
+        </ul>
+        <span class="aula-tag at-lab">lab prático</span>
+      </div>
+      <div class="aula-card">
+        <div class="aula-num">Aula 2</div>
+        <div class="aula-title">Logs centralizados com Loki</div>
+        <ul class="aula-items">
+          <li>Por que centralizar logs?</li>
+          <li>Instalar Loki + Promtail</li>
+          <li>Consultas com LogQL</li>
+          <li>Correlacionar log + métrica no Grafana</li>
+        </ul>
+        <span class="aula-tag at-lab">lab prático</span>
+      </div>
+      <div class="aula-card">
+        <div class="aula-num">Aula 3</div>
+        <div class="aula-title">Rastreamento distribuído com Jaeger</div>
+        <ul class="aula-items">
+          <li>Conceito de trace e span</li>
+          <li>OpenTelemetry como padrão</li>
+          <li>Instrumentar o serviço vote</li>
+          <li>Visualizar traces no Jaeger UI</li>
+        </ul>
+        <span class="aula-tag at-lab">lab prático</span>
+      </div>
+      <div class="aula-card">
+        <div class="aula-num">Aula 4</div>
+        <div class="aula-title">Troubleshooting real — cenários de falha</div>
+        <ul class="aula-items">
+          <li>Injeção de falhas controlada</li>
+          <li>Investigar com métricas → logs → traces</li>
+          <li>Runbook como entregável</li>
+          <li>SLO / SLA / error budget (conceito)</li>
+        </ul>
+        <span class="aula-tag at-desafio">cenário investigativo</span>
+      </div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(0,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(0,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m0s2">
+    <span class="mod-badge mb-1">Visão geral</span>
+    <p class="panel-title">Stack escolhida — PLG</p>
+    <p class="panel-sub">A stack PLG (Prometheus + Loki + Grafana) é totalmente open-source, roda bem no k3d, e é amplamente usada em produção. Um único Grafana serve como janela para os 3 pilares.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">componentes e função</span></div>
+      <div class="cmd-body"><span class="hl">Prometheus</span>     coleta e armazena métricas (já instalado)
+<span class="hl">Grafana</span>        visualização — métricas, logs e traces (já instalado)
+<span class="hl">Loki</span>           armazena e indexa logs dos containers
+<span class="hl">Promtail</span>       agente que coleta logs dos pods e envia ao Loki
+<span class="hl">Jaeger</span>         backend de traces distribuídos
+<span class="hl">OpenTelemetry</span>  SDK/coletor padrão para instrumentar aplicações
+
+<span class="c">Prometheus e Grafana já estão no ar desde o roteiro anterior.
+Loki + Promtail → Aula 2
+Jaeger + OTel   → Aula 3</span></div>
+    </div>
+    <div class="concept green">
+      <strong>Tudo no mesmo Grafana.</strong> Um dos pontos mais poderosos dessa stack é que o Grafana conecta ao Prometheus, ao Loki e ao Jaeger como data sources separados. O aluno abre uma única ferramenta e navega entre métricas, logs e traces — exatamente como faz um SRE em produção.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(0,1)">← anterior</button><button class="nav-btn" onclick="goMod(1)" style="background:var(--color-text-primary);color:var(--color-background-primary);padding:8px 18px;border-radius:var(--border-radius-md);font-family:var(--font-sans);font-size:13px;cursor:pointer;border:none;">começar aulas →</button></div>
+  </div>
+</div>
+
+<!-- ══ MODULE 1: MÉTRICAS ══ -->
+<div class="mod-panel" id="mod1">
+  <div class="steps-nav" id="nav-m1">
+    <button class="step-btn active" onclick="goStep(1,0)"><span class="snum">1</span>PromQL</button>
+    <button class="step-btn" onclick="goStep(1,1)"><span class="snum">2</span>Alertmanager</button>
+    <button class="step-btn" onclick="goStep(1,2)"><span class="snum">3</span>Dashboard</button>
+    <button class="step-btn" onclick="goStep(1,3)"><span class="snum">4</span>Métricas negócio</button>
+  </div>
+
+  <div class="step-panel active" id="m1s0">
+    <span class="mod-badge mb-1">Aula 1 — Métricas</span>
+    <p class="panel-title">PromQL além do básico</p>
+    <p class="panel-sub">No roteiro anterior os alunos viram queries simples. Aqui aprofundamos com as funções que aparecem em dashboards reais — taxa de erros, latência por percentil, disponibilidade.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">queries progressivas — colar no Prometheus :9090</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># 1. taxa de requisições HTTP por segundo (últimos 2min)</span>
+rate(http_requests_total{namespace="voteapp"}[2m])
+
+<span class="c"># 2. taxa de ERROS (status 5xx) por segundo</span>
+rate(http_requests_total{namespace="voteapp", status=~"5.."}[2m])
+
+<span class="c"># 3. percentual de erros em relação ao total</span>
+rate(http_requests_total{status=~"5.."}[2m])
+  / rate(http_requests_total[2m]) * 100
+
+<span class="c"># 4. latência no percentil 95 (p95)</span>
+histogram_quantile(0.95,
+  rate(http_request_duration_seconds_bucket{namespace="voteapp"}[5m])
+)
+
+<span class="c"># 5. uso de memória em MiB</span>
+container_memory_working_set_bytes{namespace="voteapp"}
+  / 1024 / 1024
+
+<span class="c"># 6. quantos pods do vote estão prontos agora?</span>
+kube_deployment_status_replicas_ready{
+  namespace="voteapp", deployment="vote"
+}</div>
+    </div>
+    <div class="concept amber">
+      <strong>Os 4 sinais de ouro (Google SRE).</strong> Toda observabilidade de produção orbita esses quatro: <strong>latência</strong> (quanto tempo cada requisição leva), <strong>tráfego</strong> (quantas req/s), <strong>erros</strong> (taxa de falhas) e <strong>saturação</strong> (quão "cheio" está o sistema — CPU, memória, filas). PromQL consegue expressar todos os quatro.
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(1,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m1s1">
+    <span class="mod-badge mb-1">Aula 1 — Métricas</span>
+    <p class="panel-title">Alertas com Alertmanager</p>
+    <p class="panel-sub">Prometheus detecta condições anormais via regras de alerta. O Alertmanager roteia e envia as notificações. Vamos habilitar o Alertmanager (que desabilitamos no roteiro anterior) e criar uma regra para o voteapp.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">k8s/prometheus-rules.yaml</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">apiVersion:</span> <span class="v">monitoring.coreos.com/v1</span>
+<span class="k">kind:</span> <span class="v">PrometheusRule</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">voteapp-alerts</span>
+  <span class="k">namespace:</span> <span class="v">monitoring</span>
+  <span class="k">labels:</span>
+    <span class="k">release:</span> <span class="v">kube-prometheus-stack</span>
+<span class="k">spec:</span>
+  <span class="k">groups:</span>
+  - <span class="k">name:</span> <span class="v">voteapp</span>
+    <span class="k">rules:</span>
+
+    - <span class="k">alert:</span> <span class="v">VotePodDown</span>
+      <span class="k">expr:</span> <span class="v">kube_deployment_status_replicas_ready{deployment="vote"} < 1</span>
+      <span class="k">for:</span> <span class="v">1m</span>
+      <span class="k">labels:</span>
+        <span class="k">severity:</span> <span class="v">critical</span>
+      <span class="k">annotations:</span>
+        <span class="k">summary:</span> <span class="s">"Nenhum pod do vote está pronto"</span>
+
+    - <span class="k">alert:</span> <span class="v">VoteHighCPU</span>
+      <span class="k">expr:</span> <span class="v">|
+        rate(container_cpu_usage_seconds_total{
+          namespace="voteapp", container="vote"}[2m]) > 0.25</span>
+      <span class="k">for:</span> <span class="v">2m</span>
+      <span class="k">labels:</span>
+        <span class="k">severity:</span> <span class="v">warning</span>
+      <span class="k">annotations:</span>
+        <span class="k">summary:</span> <span class="s">"CPU do vote acima de 25% por 2 minutos"</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal — aplicar e verificar</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">kubectl apply -f k8s/prometheus-rules.yaml
+
+<span class="c"># verificar no Prometheus UI: Status → Rules</span>
+<span class="c"># http://localhost:9090/rules</span>
+
+<span class="c"># disparar o alerta VotePodDown manualmente para testar</span>
+kubectl scale deployment vote --replicas=0 -n voteapp
+<span class="c"># aguardar ~1min → alerta dispara em Status → Alerts</span>
+kubectl scale deployment vote --replicas=2 -n voteapp</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(1,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(1,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m1s2">
+    <span class="mod-badge mb-1">Aula 1 — Métricas</span>
+    <p class="panel-title">Dashboard customizado no Grafana</p>
+    <p class="panel-sub">Os alunos criam um dashboard do zero para o voteapp — não importado, mas construído painel a painel. O objetivo é entender como os painéis se conectam e contar uma história com os dados.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">painéis sugeridos para o dashboard "VoteApp Overview"</span></div>
+      <div class="cmd-body"><span class="hl">Painel 1 — Stat</span>: réplicas prontas do vote
+  query: kube_deployment_status_replicas_ready{deployment="vote"}
+
+<span class="hl">Painel 2 — Time series</span>: CPU dos pods vote ao longo do tempo
+  query: rate(container_cpu_usage_seconds_total{container="vote"}[2m])
+
+<span class="hl">Painel 3 — Time series</span>: memória usada (MiB)
+  query: container_memory_working_set_bytes{container="vote"} / 1048576
+
+<span class="hl">Painel 4 — Stat</span>: número de pods no namespace voteapp
+  query: count(kube_pod_info{namespace="voteapp"})
+
+<span class="hl">Painel 5 — Alert list</span>: alertas ativos do voteapp
+  (widget nativo do Grafana, sem query manual)</div>
+    </div>
+    <div class="concept green">
+      <strong>Dica de aula.</strong> Deixar os alunos montarem o dashboard enquanto o load-generator do HPA está rodando. Eles veem os painéis "mexendo" em tempo real enquanto constroem — muito mais motivador do que dados estáticos.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(1,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(1,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m1s3">
+    <span class="mod-badge mb-1">Aula 1 — Métricas</span>
+    <p class="panel-title">Métricas de negócio — votos por minuto</p>
+    <p class="panel-sub">Métricas de infra (CPU, memória) são importantes, mas métricas de negócio são o que realmente importa para o produto. Vamos adicionar um contador de votos ao serviço Python.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">vote/app.py — adicionar counter Prometheus</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># instalar: pip install prometheus-client</span>
+from prometheus_client import Counter, make_wsgi_app
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+
+<span class="c"># definir o contador por opção de voto</span>
+vote_counter = Counter(
+    <span class="s">'voteapp_votes_total'</span>,
+    <span class="s">'Total de votos registrados'</span>,
+    [<span class="s">'option'</span>]   <span class="c"># label: "cats" ou "dogs"</span>
+)
+
+<span class="c"># na rota POST /:</span>
+@app.route("/", methods=['POST'])
+def vote():
+    vote = request.form['vote']
+    vote_counter.labels(option=vote).inc()   <span class="c"># incrementar</span>
+    <span class="c"># ... resto da lógica</span>
+
+<span class="c"># expor /metrics</span>
+app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+    <span class="s">'/metrics'</span>: make_wsgi_app()
+})</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">PromQL — taxa de votos por minuto</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># votos por minuto por opção</span>
+rate(voteapp_votes_total[1m]) * 60
+
+<span class="c"># proporção cats vs dogs em %</span>
+rate(voteapp_votes_total{option="cats"}[5m])
+  / rate(voteapp_votes_total[5m]) * 100</div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">Entregável da aula 1</div>
+      <ul>
+        <li>Dashboard "VoteApp Overview" com os 5 painéis funcionando</li>
+        <li>Alerta <code>VotePodDown</code> disparado e capturado em print</li>
+        <li>Métrica de negócio <code>voteapp_votes_total</code> aparecendo no Prometheus</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(1,2)">← anterior</button><button class="nav-btn" onclick="goMod(2)" style="background:var(--color-text-primary);color:var(--color-background-primary);padding:8px 18px;border-radius:var(--border-radius-md);font-family:var(--font-sans);font-size:13px;cursor:pointer;border:none;">próxima aula →</button></div>
+  </div>
+</div>
+
+<!-- ══ MODULE 2: LOGS ══ -->
+<div class="mod-panel" id="mod2">
+  <div class="steps-nav" id="nav-m2">
+    <button class="step-btn active" onclick="goStep(2,0)"><span class="snum">1</span>Por que Loki</button>
+    <button class="step-btn" onclick="goStep(2,1)"><span class="snum">2</span>Instalar stack</button>
+    <button class="step-btn" onclick="goStep(2,2)"><span class="snum">3</span>LogQL</button>
+    <button class="step-btn" onclick="goStep(2,3)"><span class="snum">4</span>Correlação</button>
+  </div>
+
+  <div class="step-panel active" id="m2s0">
+    <span class="mod-badge mb-2">Aula 2 — Logs</span>
+    <p class="panel-title">Por que centralizar logs?</p>
+    <p class="panel-sub">Com um único pod, <code>kubectl logs</code> basta. Com 5 serviços e 3 réplicas cada, você tem 15 streams de log separados — e quando um pod crasha, os logs somem junto com ele.</p>
+    <div class="concept amber">
+      <strong>O problema do <code>kubectl logs</code> em produção.</strong> Ele lê logs do container atual. Se o pod foi reiniciado (OOMKilled, CrashLoop), os logs da falha se perdem. Se há 10 réplicas do mesmo serviço, você precisaria de um loop para agregar. Loki resolve os dois problemas: persiste e agrega.
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">comparação — kubectl logs vs Loki</span></div>
+      <div class="cmd-body"><span class="warn">kubectl logs</span>
+  ✗ perde logs quando pod crasha
+  ✗ um stream por pod — sem agregação
+  ✗ sem busca por conteúdo
+  ✗ sem correlação com métricas
+
+<span class="hl">Loki + Grafana</span>
+  ✓ persiste logs independente do ciclo de vida do pod
+  ✓ agrega todos os pods de um Deployment
+  ✓ busca full-text com LogQL
+  ✓ correlaciona com métricas e traces no mesmo Grafana</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(2,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m2s1">
+    <span class="mod-badge mb-2">Aula 2 — Logs</span>
+    <p class="panel-title">Instalar Loki + Promtail via Helm</p>
+    <p class="panel-sub">O Promtail é um agente que roda como DaemonSet — um pod em cada nó do cluster — e coleta automaticamente os logs de todos os containers, enviando ao Loki.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+
+<span class="c"># instalar Loki (modo monolítico, simples para lab)</span>
+helm install loki grafana/loki \
+  --namespace monitoring \
+  --set loki.commonConfig.replication_factor=1 \
+  --set loki.storage.type=filesystem \
+  --set singleBinary.replicas=1
+
+<span class="c"># instalar Promtail (agente coletor de logs)</span>
+helm install promtail grafana/promtail \
+  --namespace monitoring \
+  --set config.lokiAddress=http://loki:3100/loki/api/v1/push
+
+<span class="c"># verificar</span>
+kubectl get pods -n monitoring | grep -E "loki|promtail"
+
+<span class="c"># Promtail deve ter 3 pods (1 por nó do cluster k3d)</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">adicionar Loki como data source no Grafana</span></div>
+      <div class="cmd-body">1. Grafana → Connections → Data sources → Add
+2. Tipo: Loki
+3. URL: http://loki.monitoring.svc.cluster.local:3100
+4. Save & Test → deve mostrar "Data source connected"</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(2,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(2,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m2s2">
+    <span class="mod-badge mb-2">Aula 2 — Logs</span>
+    <p class="panel-title">Consultas com LogQL</p>
+    <p class="panel-sub">LogQL é a linguagem de query do Loki — parecida com PromQL mas para texto. A sintaxe base é um seletor de stream seguido de filtros.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">LogQL — queries progressivas no Grafana (Explore)</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># 1. todos os logs do namespace voteapp</span>
+{namespace="voteapp"}
+
+<span class="c"># 2. só logs do serviço vote</span>
+{namespace="voteapp", app="vote"}
+
+<span class="c"># 3. filtrar por texto (linhas com "error")</span>
+{namespace="voteapp"} |= "error"
+
+<span class="c"># 4. excluir linhas de health check</span>
+{namespace="voteapp", app="vote"}
+  |= "POST /"
+  != "GET /health"
+
+<span class="c"># 5. extrair campo do log com regex e contar</span>
+{namespace="voteapp", app="vote"}
+  | regexp `voted for (?P<option>\w+)`
+  | count_over_time([1m])
+
+<span class="c"># 6. taxa de linhas de erro por segundo</span>
+rate({namespace="voteapp"} |= "error" [1m])</div>
+    </div>
+    <div class="concept">
+      <strong>LogQL vs PromQL.</strong> PromQL opera sobre séries numéricas. LogQL opera sobre streams de texto mas pode agregar para números (com <code>rate()</code>, <code>count_over_time()</code>). O resultado pode aparecer como time series no Grafana — isso é o que permite colocar "taxa de erros nos logs" no mesmo dashboard de métricas.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(2,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(2,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m2s3">
+    <span class="mod-badge mb-2">Aula 2 — Logs</span>
+    <p class="panel-title">Correlacionar log + métrica no Grafana</p>
+    <p class="panel-sub">O recurso mais poderoso da stack PLG: a partir de um pico de CPU no dashboard de métricas, navegar diretamente para os logs daquele período com um clique.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">configurar derived fields no data source Loki</span></div>
+      <div class="cmd-body">Grafana → Data sources → Loki → Derived Fields:
+
+Name: TraceID
+Regex: traceID=(\w+)
+Query: ${__value.raw}
+URL: http://localhost:16686/trace/${__value.raw}
+<span class="c"># isso cria um link clicável de log → trace no Jaeger</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">configurar data link no painel de métricas</span></div>
+      <div class="cmd-body">No painel de CPU do Grafana:
+  Edit → Data links → Add link:
+    Title: "Ver logs deste período"
+    URL: /explore?datasource=loki
+         &left={"queries":[{"expr":"{app=\"vote\"}"}],
+                "range":{"from":"${__from}","to":"${__to}"}}</div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">Entregável da aula 2</div>
+      <ul>
+        <li>Loki + Promtail rodando — <code>kubectl get pods -n monitoring</code> mostra tudo Running</li>
+        <li>Query LogQL filtrando logs de erro do voteapp no Grafana Explore</li>
+        <li>Painel no dashboard com taxa de linhas de erro (LogQL → time series)</li>
+        <li>Demonstrar navegação métrica → logs pelo data link</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(2,2)">← anterior</button><button class="nav-btn" onclick="goMod(3)" style="background:var(--color-text-primary);color:var(--color-background-primary);padding:8px 18px;border-radius:var(--border-radius-md);font-family:var(--font-sans);font-size:13px;cursor:pointer;border:none;">próxima aula →</button></div>
+  </div>
+</div>
+
+<!-- ══ MODULE 3: TRACES ══ -->
+<div class="mod-panel" id="mod3">
+  <div class="steps-nav" id="nav-m3">
+    <button class="step-btn active" onclick="goStep(3,0)"><span class="snum">1</span>Conceito</button>
+    <button class="step-btn" onclick="goStep(3,1)"><span class="snum">2</span>Instalar Jaeger</button>
+    <button class="step-btn" onclick="goStep(3,2)"><span class="snum">3</span>Instrumentar</button>
+    <button class="step-btn" onclick="goStep(3,3)"><span class="snum">4</span>Jaeger UI</button>
+  </div>
+
+  <div class="step-panel active" id="m3s0">
+    <span class="mod-badge mb-3">Aula 3 — Traces</span>
+    <p class="panel-title">O que é rastreamento distribuído</p>
+    <p class="panel-sub">Métricas dizem que algo está lento. Logs dizem o que aconteceu. Traces mostram <em>exatamente onde</em> o tempo foi gasto — através de todos os serviços que uma requisição atravessou.</p>
+    <div class="concept blue">
+      <strong>Trace vs Span.</strong> Um <strong>trace</strong> é o registro completo de uma requisição do início ao fim. Ele é composto de <strong>spans</strong> — cada span representa uma operação dentro de um serviço (receber a requisição, consultar o Redis, responder). Os spans têm duração, status e podem ter spans filhos formando uma árvore.
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">exemplo de trace do voteapp</span></div>
+      <div class="cmd-body">Requisição: POST /vote (usuário clica em "Cats")
+
+Trace (total: 45ms):
+├── vote-service: receber POST /vote          [0ms → 45ms]
+│   ├── redis: SET vote:user123 "cats"        [2ms → 8ms]
+│   └── redis: EXPIRE vote:user123 86400      [8ms → 12ms]
+│
+<span class="c"># o worker processa assincronamente:</span>
+└── worker: processar voto da fila            [assíncrono]
+    └── postgres: INSERT INTO votes...        [5ms → 18ms]
+
+<span class="c"># o trace mostra: Redis está rápido (6ms), Postgres ok (13ms)
+# se Postgres demorar 800ms → gargalo identificado</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(3,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m3s1">
+    <span class="mod-badge mb-3">Aula 3 — Traces</span>
+    <p class="panel-title">Instalar Jaeger no cluster</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">k8s/jaeger.yaml — modo all-in-one para lab</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">apiVersion:</span> <span class="v">apps/v1</span>
+<span class="k">kind:</span> <span class="v">Deployment</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">jaeger</span>
+  <span class="k">namespace:</span> <span class="v">monitoring</span>
+<span class="k">spec:</span>
+  <span class="k">replicas:</span> <span class="v">1</span>
+  <span class="k">selector:</span>
+    <span class="k">matchLabels:</span>
+      <span class="k">app:</span> <span class="v">jaeger</span>
+  <span class="k">template:</span>
+    <span class="k">metadata:</span>
+      <span class="k">labels:</span>
+        <span class="k">app:</span> <span class="v">jaeger</span>
+    <span class="k">spec:</span>
+      <span class="k">containers:</span>
+      - <span class="k">name:</span> <span class="v">jaeger</span>
+        <span class="k">image:</span> <span class="v">jaegertracing/all-in-one:latest</span>
+        <span class="k">env:</span>
+        - <span class="k">name:</span> <span class="v">COLLECTOR_OTLP_ENABLED</span>
+          <span class="k">value:</span> <span class="s">"true"</span>
+        <span class="k">ports:</span>
+        - <span class="k">containerPort:</span> <span class="v">16686</span>   <span class="c"># UI</span>
+        - <span class="k">containerPort:</span> <span class="v">4317</span>    <span class="c"># OTLP gRPC</span>
+        - <span class="k">containerPort:</span> <span class="v">4318</span>    <span class="c"># OTLP HTTP</span>
+---
+<span class="k">apiVersion:</span> <span class="v">v1</span>
+<span class="k">kind:</span> <span class="v">Service</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">jaeger</span>
+  <span class="k">namespace:</span> <span class="v">monitoring</span>
+<span class="k">spec:</span>
+  <span class="k">selector:</span>
+    <span class="k">app:</span> <span class="v">jaeger</span>
+  <span class="k">ports:</span>
+  - <span class="k">name:</span> <span class="v">ui</span>
+    <span class="k">port:</span> <span class="v">16686</span>
+  - <span class="k">name:</span> <span class="v">otlp-grpc</span>
+    <span class="k">port:</span> <span class="v">4317</span>
+  - <span class="k">name:</span> <span class="v">otlp-http</span>
+    <span class="k">port:</span> <span class="v">4318</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">kubectl apply -f k8s/jaeger.yaml
+
+<span class="c"># acessar UI do Jaeger</span>
+kubectl port-forward -n monitoring svc/jaeger 16686:16686 &
+<span class="c"># http://localhost:16686</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(3,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(3,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m3s2">
+    <span class="mod-badge mb-3">Aula 3 — Traces</span>
+    <p class="panel-title">Instrumentar o serviço vote com OpenTelemetry</p>
+    <p class="panel-sub">OpenTelemetry é o padrão aberto para instrumentação. Adicionamos algumas linhas ao <code>app.py</code> do vote e os traces aparecem automaticamente no Jaeger.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">vote/requirements.txt — adicionar dependências</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">opentelemetry-distro
+opentelemetry-exporter-otlp
+opentelemetry-instrumentation-flask
+opentelemetry-instrumentation-redis</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">vote/app.py — inicializar OpenTelemetry</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.instrumentation.redis import RedisInstrumentor
+
+<span class="c"># inicializar provider e exporter</span>
+provider = TracerProvider()
+exporter = OTLPSpanExporter(
+    endpoint=<span class="s">"http://jaeger.monitoring.svc.cluster.local:4318/v1/traces"</span>
+)
+provider.add_span_processor(BatchSpanProcessor(exporter))
+trace.set_tracer_provider(provider)
+
+<span class="c"># instrumentar Flask e Redis automaticamente</span>
+FlaskInstrumentor().instrument_app(app)
+RedisInstrumentor().instrument()
+
+<span class="c"># agora TODA requisição Flask e chamada Redis</span>
+<span class="c"># gera spans automaticamente — sem mudar mais nada</span></div>
+    </div>
+    <div class="concept green">
+      <strong>Auto-instrumentação.</strong> O <code>FlaskInstrumentor</code> e o <code>RedisInstrumentor</code> "envolvem" as bibliotecas existentes e geram spans sem modificar o código de negócio. Para spans customizados (ex: "processar voto"), usa-se <code>tracer.start_as_current_span("processar-voto")</code>.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(3,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(3,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m3s3">
+    <span class="mod-badge mb-3">Aula 3 — Traces</span>
+    <p class="panel-title">Explorar traces no Jaeger UI e Grafana</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">gerar tráfego e explorar</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># gerar alguns votos para ter traces</span>
+for i in $(seq 1 20); do
+  curl -s -X POST http://vote.local/ -d "vote=cats" > /dev/null
+  curl -s -X POST http://vote.local/ -d "vote=dogs" > /dev/null
+done
+
+<span class="c"># Jaeger UI: http://localhost:16686
+# Service: vote → Find Traces
+# ver waterfall dos spans por requisição</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">adicionar Jaeger como data source no Grafana</span></div>
+      <div class="cmd-body">Grafana → Connections → Data sources → Add → Jaeger
+URL: http://jaeger.monitoring.svc.cluster.local:16686
+Save & Test
+
+<span class="c"># agora em Grafana Explore, selecionar Jaeger</span>
+<span class="c"># buscar por service: vote</span>
+<span class="c"># clicar em um trace → ver a árvore de spans</span></div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">Entregável da aula 3</div>
+      <ul>
+        <li>Print do Jaeger UI mostrando um trace completo do serviço vote</li>
+        <li>Identificar qual span (Redis ou Flask) tem maior latência</li>
+        <li>Trace visível também no Grafana Explore via data source Jaeger</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(3,2)">← anterior</button><button class="nav-btn" onclick="goMod(4)" style="background:var(--color-text-primary);color:var(--color-background-primary);padding:8px 18px;border-radius:var(--border-radius-md);font-family:var(--font-sans);font-size:13px;cursor:pointer;border:none;">próxima aula →</button></div>
+  </div>
+</div>
+
+<!-- ══ MODULE 4: TROUBLESHOOTING ══ -->
+<div class="mod-panel" id="mod4">
+  <div class="steps-nav" id="nav-m4">
+    <button class="step-btn active" onclick="goStep(4,0)"><span class="snum">1</span>Metodologia</button>
+    <button class="step-btn" onclick="goStep(4,1)"><span class="snum">2</span>Cenários de falha</button>
+    <button class="step-btn" onclick="goStep(4,2)"><span class="snum">3</span>Runbook</button>
+    <button class="step-btn" onclick="goStep(4,3)"><span class="snum">4</span>SLO / Error budget</button>
+  </div>
+
+  <div class="step-panel active" id="m4s0">
+    <span class="mod-badge mb-4">Aula 4 — Troubleshooting</span>
+    <p class="panel-title">Metodologia de investigação</p>
+    <p class="panel-sub">A aula de troubleshooting é o grand finale — os alunos usam tudo que aprenderam para investigar falhas injetadas intencionalmente no voteapp. A dupla recebe um sintoma e precisa chegar à causa raiz.</p>
+    <div class="concept coral">
+      <strong>O fluxo padrão de investigação.</strong> Sempre parte do sintoma mais visível e vai afunilando: métricas (o quê e quando?) → logs (o que aconteceu?) → traces (onde na cadeia de serviços?). Cada pilar estreita o espaço de busca até chegar à linha de código ou configuração responsável.
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">metodologia USE + RED</span></div>
+      <div class="cmd-body"><span class="hl">USE</span> (para recursos de infraestrutura)
+  Utilization  → qual % do recurso está sendo usado?
+  Saturation   → há fila/espera? o recurso está sobrecarregado?
+  Errors       → há erros nesse recurso?
+
+<span class="hl">RED</span> (para serviços / APIs)
+  Rate         → quantas requisições por segundo?
+  Errors       → qual a taxa de erros?
+  Duration     → qual a latência (p50, p95, p99)?
+
+<span class="c"># USE para Redis, Postgres, nós k8s
+# RED para vote service, result service, worker</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(4,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m4s1">
+    <span class="mod-badge mb-4">Aula 4 — Troubleshooting</span>
+    <p class="panel-title">Cenários de falha para investigação em dupla</p>
+    <p class="panel-sub">O professor injeta uma das falhas abaixo sem revelar qual. A dupla tem 20 minutos para diagnosticar usando métricas, logs e traces, e apresentar a causa raiz.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">cenário A — OOMKilled (pod morto por falta de memória)</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># injetar: limit de memória muito baixo no vote</span>
+kubectl patch deployment vote -n voteapp \
+  --type=json \
+  -p='[{"op":"replace","path":"/spec/template/spec/containers/0/resources/limits/memory","value":"10Mi"}]'
+
+<span class="c"># sintoma: pods reiniciando constantemente (CrashLoopBackOff)
+# pista métrica: kube_pod_container_status_restarts_total subindo
+# pista log: "Killed" nos logs do pod anterior (kubectl logs --previous)
+# causa raiz: memory limit abaixo do necessário</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">cenário B — Redis indisponível</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># injetar: escalar Redis para 0 réplicas</span>
+kubectl scale deployment redis --replicas=0 -n voteapp
+
+<span class="c"># sintoma: votos não funcionam, página carrega mas dá erro ao votar
+# pista métrica: taxa de erros 5xx no vote sobe
+# pista log: "Connection refused" ou "redis.exceptions.ConnectionError"
+# pista trace: span Redis com status ERROR e duração alta (timeout)
+# causa raiz: Redis indisponível</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">cenário C — worker com bug (image quebrada)</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># injetar: image inexistente no worker (simula deploy com bug)</span>
+kubectl set image deployment/worker \
+  worker=dockersamples/examplevotingapp_worker:broken \
+  -n voteapp
+
+<span class="c"># sintoma: votos somem — aparecem na fila mas não chegam ao Postgres
+# pista métrica: pods do worker em ImagePullBackOff
+# pista log: worker sem logs novos (pod não iniciou)
+# kubectl get events -n voteapp → "Failed to pull image"
+# causa raiz: image inválida no worker</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(4,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(4,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m4s2">
+    <span class="mod-badge mb-4">Aula 4 — Troubleshooting</span>
+    <p class="panel-title">Runbook como entregável</p>
+    <p class="panel-sub">Um runbook é um documento que descreve como diagnosticar e resolver um problema específico. É o entregável da aula 4 — cada dupla documenta o cenário que investigou.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">template de runbook — runbook-redis-down.md</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"># Runbook: Redis indisponível
+
+## Sintoma
+Votos não são registrados. Usuário recebe erro 500 ao clicar.
+
+## Detecção
+- Alerta: VotePodDown dispara (ou taxa de 5xx > threshold)
+- Dashboard: painel de erros mostra pico repentino
+
+## Diagnóstico
+
+### 1. verificar pods
+```bash
+kubectl get pods -n voteapp
+# worker e vote podem estar em CrashLoopBackOff
+```
+
+### 2. verificar logs do vote
+```bash
+kubectl logs -l app=vote -n voteapp --tail=50
+# procurar: "ConnectionError", "redis", "ECONNREFUSED"
+```
+
+### 3. verificar Redis
+```bash
+kubectl get deployment redis -n voteapp
+kubectl describe pod -l app=redis -n voteapp
+```
+
+## Resolução
+```bash
+kubectl scale deployment redis --replicas=1 -n voteapp
+kubectl rollout status deployment/redis -n voteapp
+```
+
+## Prevenção
+- Adicionar healthcheck no Redis (já feito no roteiro base)
+- Configurar readinessProbe no vote apontando para conexão Redis
+- Alerta: redis_connected_clients == 0</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(4,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(4,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m4s3">
+    <span class="mod-badge mb-4">Aula 4 — Troubleshooting</span>
+    <p class="panel-title">SLO, SLA e Error Budget — conceito de fechamento</p>
+    <p class="panel-sub">Uma forma elegante de fechar a disciplina: conectar tudo que foi visto (métricas, alertas, disponibilidade) ao vocabulário que os alunos vão encontrar em vagas de SRE e DevOps.</p>
+    <div class="concept">
+      <strong>SLI → SLO → SLA.</strong> <strong>SLI</strong> (Service Level Indicator) é a métrica medida — ex: "% de requisições com status 2xx". <strong>SLO</strong> (Objective) é a meta — ex: "99,5% das requisições bem-sucedidas". <strong>SLA</strong> (Agreement) é o contrato com penalidades se o SLO não for atingido. O Prometheus mede o SLI; o Grafana alerta quando o SLO está em risco.
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">PromQL — calcular SLI de disponibilidade do voteapp</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># SLI: % de requisições bem-sucedidas nos últimos 30 dias</span>
+(
+  sum(increase(http_requests_total{
+    namespace="voteapp", status!~"5.."}[30d]))
+  /
+  sum(increase(http_requests_total{namespace="voteapp"}[30d]))
+) * 100
+
+<span class="c"># Error budget: quanto "espaço" ainda temos para erros?
+# Se SLO = 99.5% e SLI atual = 99.8%:
+# error budget consumido = (100 - 99.8) / (100 - 99.5) = 40%
+# ainda temos 60% do budget disponível</span></div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">Checklist final das 4 aulas de observabilidade</div>
+      <ul>
+        <li>Prometheus com alertas customizados para o voteapp</li>
+        <li>Loki centralizando logs — query LogQL filtrando erros</li>
+        <li>Jaeger recebendo traces do serviço vote instrumentado</li>
+        <li>Grafana unificando métricas + logs + traces em um único painel</li>
+        <li>Runbook documentando um cenário de falha investigado pela dupla</li>
+        <li>SLI calculado em PromQL e exibido no dashboard</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(4,2)">← anterior</button><button class="nav-btn" disabled>fim do roteiro</button></div>
+  </div>
+</div>
+</div>
+
+<script>
+function goMod(m) {
+  document.querySelectorAll('.mod-panel').forEach((p,i) => p.classList.toggle('active', i===m));
+  document.querySelectorAll('.mod-btn').forEach((b,i) => b.classList.toggle('active', i===m));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goStep(mod, step) {
+  const panels = document.querySelectorAll('#mod' + mod + ' .step-panel');
+  const btns = document.querySelectorAll('#nav-m' + mod + ' .step-btn');
+  panels.forEach((p,i) => p.classList.toggle('active', i===step));
+  btns.forEach((b,i) => { b.classList.remove('active','done'); if(i===step) b.classList.add('active'); else if(i<step) b.classList.add('done'); });
+}
+function cp(btn) {
+  const body = btn.closest('.cmd-block').querySelector('.cmd-body');
+  navigator.clipboard.writeText(body.innerText).then(() => {
+    btn.textContent = 'copiado!'; setTimeout(() => btn.textContent = 'copiar', 1500);
+  });
+}
+</script>

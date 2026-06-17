@@ -1,0 +1,614 @@
+
+<style>
+:root { --step-w: 32px; }
+body { font-family: var(--font-mono, monospace); }
+
+.guide { max-width: 820px; padding: 1rem 0 2rem; }
+
+/* progress header */
+.steps-nav { display: flex; gap: 0; margin-bottom: 2rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+.step-btn { flex: 1; padding: 10px 4px; font-size: 11px; font-family: var(--font-sans); font-weight: 500; background: var(--color-background-primary); color: var(--color-text-tertiary); border: none; border-right: 0.5px solid var(--color-border-tertiary); cursor: pointer; transition: background 0.15s; line-height: 1.3; }
+.step-btn:last-child { border-right: none; }
+.step-btn:hover { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+.step-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.step-btn .snum { display: block; font-size: 16px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+.step-btn.done .snum::after { content: ' ✓'; font-size: 13px; color: #1D9E75; }
+
+/* panels */
+.panel { display: none; }
+.panel.active { display: block; }
+
+.panel-title { font-family: var(--font-sans); font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+.panel-sub { font-family: var(--font-sans); font-size: 13px; color: var(--color-text-secondary); margin: 0 0 1.5rem; line-height: 1.5; }
+
+/* concept box */
+.concept { background: var(--color-background-secondary); border-left: 3px solid #7F77DD; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 12px 16px; margin-bottom: 1.5rem; font-family: var(--font-sans); font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.concept strong { color: var(--color-text-primary); font-weight: 500; }
+
+/* section label */
+.slabel { font-family: var(--font-sans); font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.07em; margin: 1.5rem 0 8px; }
+
+/* command block */
+.cmd-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); margin-bottom: 10px; overflow: hidden; }
+.cmd-header { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.cmd-label { font-family: var(--font-sans); font-size: 11px; color: var(--color-text-tertiary); }
+.copy-btn { font-family: var(--font-sans); font-size: 11px; color: var(--color-text-secondary); background: none; border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+.copy-btn:hover { background: var(--color-background-primary); }
+.cmd-body { padding: 10px 14px; font-size: 12.5px; line-height: 1.7; color: var(--color-text-primary); white-space: pre; overflow-x: auto; }
+.cmd-body .comment { color: var(--color-text-tertiary); }
+.cmd-body .hl { color: #1D9E75; }
+
+/* yaml block */
+.yaml-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); margin-bottom: 12px; overflow: hidden; }
+.yaml-header { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.yaml-filename { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+.yaml-badge { font-family: var(--font-sans); font-size: 10px; padding: 2px 7px; border-radius: 10px; }
+.yb-deploy { background: #E6F1FB; color: #185FA5; }
+.yb-service { background: #EAF3DE; color: #3B6D11; }
+.yb-secret { background: #FAEEDA; color: #854F0B; }
+.yb-pvc { background: #FAECE7; color: #993C1D; }
+.yaml-body { padding: 10px 14px; font-size: 12px; line-height: 1.7; color: var(--color-text-primary); white-space: pre; overflow-x: auto; }
+.yaml-body .k { color: #7F77DD; }
+.yaml-body .v { color: #1D9E75; }
+.yaml-body .c { color: var(--color-text-tertiary); }
+.yaml-body .s { color: #D85A30; }
+
+/* verify box */
+.verify { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px 16px; margin-top: 1rem; font-family: var(--font-sans); }
+.verify-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 8px; }
+.verify ul { margin: 0; padding-left: 1.1rem; font-size: 13px; color: var(--color-text-secondary); line-height: 1.8; }
+.verify ul li::marker { color: #1D9E75; }
+
+/* nav buttons */
+.nav-row { display: flex; justify-content: space-between; margin-top: 2rem; }
+.nav-btn { font-family: var(--font-sans); font-size: 13px; padding: 8px 20px; border-radius: var(--border-radius-md); cursor: pointer; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); }
+.nav-btn:hover { background: var(--color-background-secondary); }
+.nav-btn.primary { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* comparison table */
+.comp-table { width: 100%; border-collapse: collapse; font-family: var(--font-sans); font-size: 13px; margin-bottom: 1.5rem; }
+.comp-table th { padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+.comp-table td { padding: 9px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); vertical-align: top; color: var(--color-text-secondary); line-height: 1.5; }
+.comp-table td:first-child { font-weight: 500; color: var(--color-text-primary); width: 120px; }
+.comp-table td.compose { color: #185FA5; }
+.comp-table td.k8s { color: #1D9E75; }
+</style>
+
+<div class="guide">
+
+<div class="steps-nav" id="nav">
+  <button class="step-btn active" onclick="go(0)"><span class="snum">1</span>Preparação</button>
+  <button class="step-btn" onclick="go(1)"><span class="snum">2</span>Cluster k3d</button>
+  <button class="step-btn" onclick="go(2)"><span class="snum">3</span>Conceitos</button>
+  <button class="step-btn" onclick="go(3)"><span class="snum">4</span>Namespace</button>
+  <button class="step-btn" onclick="go(4)"><span class="snum">5</span>Redis</button>
+  <button class="step-btn" onclick="go(5)"><span class="snum">6</span>Postgres</button>
+  <button class="step-btn" onclick="go(6)"><span class="snum">7</span>Worker</button>
+  <button class="step-btn" onclick="go(7)"><span class="snum">8</span>Vote + Result</button>
+  <button class="step-btn" onclick="go(8)"><span class="snum">9</span>Acesso</button>
+</div>
+
+<!-- STEP 1 -->
+<div class="panel active" id="p0">
+  <p class="panel-title">Preparação do ambiente</p>
+  <p class="panel-sub">Antes de criar qualquer manifest, vamos garantir que as ferramentas estão instaladas. k3d roda Kubernetes dentro de containers Docker — por isso o Docker já estar instalado é suficiente.</p>
+
+  <div class="concept">
+    <strong>Por que k3d?</strong> k3d cria clusters k3s (Kubernetes leve) como containers Docker. Os alunos já conhecem Docker; o cluster inteiro aparece como containers no <code>docker ps</code>. Sem VM, sem instalação pesada.
+  </div>
+
+  <div class="slabel">Instalar k3d</div>
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal — Linux / macOS</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body"><span class="comment"># instala k3d via script oficial</span>
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+
+<span class="comment"># verifica instalação</span>
+k3d version</div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal — Windows (winget)</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body">winget install k3d</div>
+  </div>
+
+  <div class="slabel">Instalar kubectl</div>
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body"><span class="comment"># Linux</span>
+curl -LO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+
+<span class="comment"># macOS</span>
+brew install kubectl
+
+<span class="comment"># Windows</span>
+winget install Kubernetes.kubectl</div>
+  </div>
+
+  <div class="verify">
+    <div class="verify-title">Checklist antes de continuar</div>
+    <ul>
+      <li><code>docker ps</code> funciona sem erro</li>
+      <li><code>k3d version</code> mostra versão ≥ 5.x</li>
+      <li><code>kubectl version --client</code> mostra versão</li>
+    </ul>
+  </div>
+  <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="go(1)">próximo →</button></div>
+</div>
+
+<!-- STEP 2 -->
+<div class="panel" id="p1">
+  <p class="panel-title">Criar o cluster k3d</p>
+  <p class="panel-sub">Um único comando cria um cluster completo com 1 nó servidor e 2 nós workers, além de mapear as portas que usaremos para acessar a aplicação.</p>
+
+  <div class="slabel">Criar o cluster</div>
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body">k3d cluster create voteapp \
+  --servers 1 \
+  --agents 2 \
+  --port <span class="hl">8080:30000@loadbalancer</span> \
+  --port <span class="hl">8081:30001@loadbalancer</span>
+
+<span class="comment"># porta 8080 → serviço vote (NodePort 30000)
+# porta 8081 → serviço result (NodePort 30001)</span></div>
+  </div>
+
+  <div class="slabel">Verificar o cluster</div>
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body"><span class="comment"># lista os nós</span>
+kubectl get nodes
+
+<span class="comment"># deve mostrar 3 nós: 1 control-plane + 2 agents</span>
+NAME                    STATUS   ROLES
+k3d-voteapp-server-0    Ready    control-plane
+k3d-voteapp-agent-0     Ready    &lt;none&gt;
+k3d-voteapp-agent-1     Ready    &lt;none&gt;
+
+<span class="comment"># os nós são containers Docker!</span>
+docker ps --format "table {{.Names}}\t{{.Status}}"</div>
+  </div>
+
+  <div class="concept">
+    <strong>O que aconteceu?</strong> k3d criou 3 containers Docker que formam um cluster Kubernetes. O <code>kubeconfig</code> foi automaticamente configurado — <code>kubectl</code> já sabe falar com esse cluster.
+  </div>
+
+  <div class="nav-row"><button class="nav-btn" onclick="go(0)">← anterior</button><button class="nav-btn primary" onclick="go(2)">próximo →</button></div>
+</div>
+
+<!-- STEP 3 -->
+<div class="panel" id="p2">
+  <p class="panel-title">Conceitos: compose → Kubernetes</p>
+  <p class="panel-sub">Antes de escrever os manifests, é útil entender como cada conceito do docker-compose se traduz em k8s.</p>
+
+  <table class="comp-table">
+    <thead><tr><th>Conceito</th><th>docker-compose</th><th>Kubernetes</th></tr></thead>
+    <tbody>
+      <tr><td>Executar container</td><td class="compose">service com image:</td><td class="k8s">Pod / Deployment</td></tr>
+      <tr><td>Reiniciar automaticamente</td><td class="compose">restart: always</td><td class="k8s">Deployment (garante réplicas)</td></tr>
+      <tr><td>Rede entre serviços</td><td class="compose">networks: back-tier</td><td class="k8s">Service (ClusterIP)</td></tr>
+      <tr><td>Expor porta para host</td><td class="compose">ports: "8080:80"</td><td class="k8s">Service (NodePort ou LoadBalancer)</td></tr>
+      <tr><td>Variável de ambiente</td><td class="compose">environment:</td><td class="k8s">env: no Deployment ou Secret</td></tr>
+      <tr><td>Volume persistente</td><td class="compose">volumes: db-data</td><td class="k8s">PersistentVolumeClaim</td></tr>
+      <tr><td>depends_on</td><td class="compose">depends_on:</td><td class="k8s">não existe — usa readiness probe</td></tr>
+      <tr><td>Escalar serviço</td><td class="compose">deploy: replicas:</td><td class="k8s">spec.replicas: no Deployment</td></tr>
+    </tbody>
+  </table>
+
+  <div class="concept">
+    <strong>Estrutura dos arquivos.</strong> Vamos criar um diretório <code>k8s/</code> dentro do repositório. Cada serviço terá seu próprio arquivo YAML com dois recursos: um <strong>Deployment</strong> (como rodar) e um <strong>Service</strong> (como conectar). Postgres e Redis terão também um <strong>PVC</strong>.
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">estrutura de arquivos</span></div>
+    <div class="cmd-body">voteapplication/
+└── k8s/
+    ├── namespace.yaml
+    ├── redis-deployment.yaml
+    ├── postgres-deployment.yaml
+    ├── postgres-secret.yaml
+    ├── worker-deployment.yaml
+    ├── vote-deployment.yaml
+    └── result-deployment.yaml</div>
+  </div>
+
+  <div class="nav-row"><button class="nav-btn" onclick="go(1)">← anterior</button><button class="nav-btn primary" onclick="go(3)">próximo →</button></div>
+</div>
+
+<!-- STEP 4 -->
+<div class="panel" id="p3">
+  <p class="panel-title">Namespace</p>
+  <p class="panel-sub">Namespace é um espaço isolado dentro do cluster. Agrupa todos os recursos da aplicação e facilita limpar tudo de uma vez.</p>
+
+  <div class="yaml-block">
+    <div class="yaml-header"><span class="yaml-filename">k8s/namespace.yaml</span><span class="yaml-badge yb-deploy">Namespace</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">v1</span>
+<span class="k">kind:</span> <span class="v">Namespace</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">voteapp</span>
+  <span class="k">labels:</span>
+    <span class="k">app:</span> <span class="v">vote-application</span></div>
+  </div>
+
+  <div class="slabel">Aplicar e verificar</div>
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body">kubectl apply -f k8s/namespace.yaml
+
+kubectl get namespaces
+<span class="comment"># deve aparecer "voteapp" na lista</span>
+
+<span class="comment"># dica: setar namespace padrão para não repetir -n voteapp</span>
+kubectl config set-context --current --namespace=voteapp</div>
+  </div>
+
+  <div class="nav-row"><button class="nav-btn" onclick="go(2)">← anterior</button><button class="nav-btn primary" onclick="go(4)">próximo →</button></div>
+</div>
+
+<!-- STEP 5 -->
+<div class="panel" id="p4">
+  <p class="panel-title">Redis</p>
+  <p class="panel-sub">Redis não precisa de volume persistente (dados são efêmeros por design no voteapp). Deployment simples + ClusterIP para comunicação interna.</p>
+
+  <div class="yaml-block">
+    <div class="yaml-header"><span class="yaml-filename">k8s/redis-deployment.yaml</span><span class="yaml-badge yb-deploy">Deployment</span><span class="yaml-badge yb-service">Service</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">apps/v1</span>
+<span class="k">kind:</span> <span class="v">Deployment</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">redis</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">replicas:</span> <span class="v">1</span>
+  <span class="k">selector:</span>
+    <span class="k">matchLabels:</span>
+      <span class="k">app:</span> <span class="v">redis</span>
+  <span class="k">template:</span>
+    <span class="k">metadata:</span>
+      <span class="k">labels:</span>
+        <span class="k">app:</span> <span class="v">redis</span>
+    <span class="k">spec:</span>
+      <span class="k">containers:</span>
+      - <span class="k">name:</span> <span class="v">redis</span>
+        <span class="k">image:</span> <span class="v">redis:alpine</span>
+        <span class="k">ports:</span>
+        - <span class="k">containerPort:</span> <span class="v">6379</span>
+---
+<span class="k">apiVersion:</span> <span class="v">v1</span>
+<span class="k">kind:</span> <span class="v">Service</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">redis</span>          <span class="c"># nome DNS interno: redis.voteapp.svc.cluster.local</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">type:</span> <span class="v">ClusterIP</span>     <span class="c"># apenas acessível dentro do cluster</span>
+  <span class="k">selector:</span>
+    <span class="k">app:</span> <span class="v">redis</span>
+  <span class="k">ports:</span>
+  - <span class="k">port:</span> <span class="v">6379</span>
+    <span class="k">targetPort:</span> <span class="v">6379</span></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body">kubectl apply -f k8s/redis-deployment.yaml
+
+kubectl get pods,svc -n voteapp
+<span class="comment"># pod redis deve estar Running</span></div>
+  </div>
+
+  <div class="nav-row"><button class="nav-btn" onclick="go(3)">← anterior</button><button class="nav-btn primary" onclick="go(5)">próximo →</button></div>
+</div>
+
+<!-- STEP 6 -->
+<div class="panel" id="p5">
+  <p class="panel-title">Postgres + Secret + PVC</p>
+  <p class="panel-sub">Postgres precisa de persistência (PVC) e a senha deve ir em um Secret, não em texto no Deployment — boa prática que vale reforçar em aula.</p>
+
+  <div class="yaml-block">
+    <div class="yaml-header"><span class="yaml-filename">k8s/postgres-secret.yaml</span><span class="yaml-badge yb-secret">Secret</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">v1</span>
+<span class="k">kind:</span> <span class="v">Secret</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">postgres-secret</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">type:</span> <span class="v">Opaque</span>
+<span class="k">stringData:</span>
+  <span class="k">POSTGRES_DB:</span> <span class="v">db</span>
+  <span class="k">POSTGRES_HOST_AUTH_METHOD:</span> <span class="v">trust</span></div>
+  </div>
+
+  <div class="yaml-block">
+    <div class="yaml-header"><span class="yaml-filename">k8s/postgres-deployment.yaml</span><span class="yaml-badge yb-pvc">PVC</span><span class="yaml-badge yb-deploy">Deployment</span><span class="yaml-badge yb-service">Service</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">v1</span>
+<span class="k">kind:</span> <span class="v">PersistentVolumeClaim</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">postgres-pvc</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">accessModes:</span> [<span class="v">ReadWriteOnce</span>]
+  <span class="k">resources:</span>
+    <span class="k">requests:</span>
+      <span class="k">storage:</span> <span class="v">1Gi</span>
+---
+<span class="k">apiVersion:</span> <span class="v">apps/v1</span>
+<span class="k">kind:</span> <span class="v">Deployment</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">db</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">replicas:</span> <span class="v">1</span>
+  <span class="k">selector:</span>
+    <span class="k">matchLabels:</span>
+      <span class="k">app:</span> <span class="v">db</span>
+  <span class="k">template:</span>
+    <span class="k">metadata:</span>
+      <span class="k">labels:</span>
+        <span class="k">app:</span> <span class="v">db</span>
+    <span class="k">spec:</span>
+      <span class="k">containers:</span>
+      - <span class="k">name:</span> <span class="v">postgres</span>
+        <span class="k">image:</span> <span class="v">postgres:9.4</span>
+        <span class="k">envFrom:</span>
+        - <span class="k">secretRef:</span>
+            <span class="k">name:</span> <span class="v">postgres-secret</span>
+        <span class="k">ports:</span>
+        - <span class="k">containerPort:</span> <span class="v">5432</span>
+        <span class="k">volumeMounts:</span>
+        - <span class="k">mountPath:</span> <span class="v">/var/lib/postgresql/data</span>
+          <span class="k">name:</span> <span class="v">postgres-storage</span>
+      <span class="k">volumes:</span>
+      - <span class="k">name:</span> <span class="v">postgres-storage</span>
+        <span class="k">persistentVolumeClaim:</span>
+          <span class="k">claimName:</span> <span class="v">postgres-pvc</span>
+---
+<span class="k">apiVersion:</span> <span class="v">v1</span>
+<span class="k">kind:</span> <span class="v">Service</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">db</span>              <span class="c"># worker vai conectar em "db:5432"</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">type:</span> <span class="v">ClusterIP</span>
+  <span class="k">selector:</span>
+    <span class="k">app:</span> <span class="v">db</span>
+  <span class="k">ports:</span>
+  - <span class="k">port:</span> <span class="v">5432</span>
+    <span class="k">targetPort:</span> <span class="v">5432</span></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body">kubectl apply -f k8s/postgres-secret.yaml
+kubectl apply -f k8s/postgres-deployment.yaml
+
+kubectl get pvc,pods,svc -n voteapp
+<span class="comment"># pvc deve estar Bound, pod db Running</span></div>
+  </div>
+
+  <div class="nav-row"><button class="nav-btn" onclick="go(4)">← anterior</button><button class="nav-btn primary" onclick="go(6)">próximo →</button></div>
+</div>
+
+<!-- STEP 7 -->
+<div class="panel" id="p6">
+  <p class="panel-title">Worker</p>
+  <p class="panel-sub">O worker não expõe porta — consome Redis e grava no Postgres. Só precisa de Deployment. Usamos a imagem pré-construída do Docker Hub.</p>
+
+  <div class="yaml-block">
+    <div class="yaml-header"><span class="yaml-filename">k8s/worker-deployment.yaml</span><span class="yaml-badge yb-deploy">Deployment</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">apps/v1</span>
+<span class="k">kind:</span> <span class="v">Deployment</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">worker</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">replicas:</span> <span class="v">1</span>
+  <span class="k">selector:</span>
+    <span class="k">matchLabels:</span>
+      <span class="k">app:</span> <span class="v">worker</span>
+  <span class="k">template:</span>
+    <span class="k">metadata:</span>
+      <span class="k">labels:</span>
+        <span class="k">app:</span> <span class="v">worker</span>
+    <span class="k">spec:</span>
+      <span class="k">containers:</span>
+      - <span class="k">name:</span> <span class="v">worker</span>
+        <span class="k">image:</span> <span class="v">dockersamples/examplevotingapp_worker</span>
+        <span class="k">env:</span>
+        - <span class="k">name:</span> <span class="v">REDIS_HOST</span>    <span class="c"># resolve via DNS do Service redis</span>
+          <span class="k">value:</span> <span class="s">"redis"</span>
+        - <span class="k">name:</span> <span class="v">DB_HOST</span>
+          <span class="k">value:</span> <span class="s">"db"</span></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body">kubectl apply -f k8s/worker-deployment.yaml
+
+<span class="comment"># acompanhar logs do worker em tempo real</span>
+kubectl logs -f deployment/worker -n voteapp</div>
+  </div>
+
+  <div class="concept">
+    <strong>DNS interno do k8s.</strong> O worker se conecta ao Redis simplesmente usando o hostname <code>redis</code> — o mesmo nome que demos ao Service. O Kubernetes resolve automaticamente <code>redis</code> → IP interno do pod Redis dentro do namespace. Igual ao que o compose fazia com as networks.
+  </div>
+
+  <div class="nav-row"><button class="nav-btn" onclick="go(5)">← anterior</button><button class="nav-btn primary" onclick="go(7)">próximo →</button></div>
+</div>
+
+<!-- STEP 8 -->
+<div class="panel" id="p7">
+  <p class="panel-title">Vote + Result (NodePort)</p>
+  <p class="panel-sub">Os dois frontends precisam ser acessíveis do browser. Usamos <code>NodePort</code> — tipo de Service que expõe uma porta em todos os nós do cluster. O k3d já mapeou essas portas para o localhost.</p>
+
+  <div class="yaml-block">
+    <div class="yaml-header"><span class="yaml-filename">k8s/vote-deployment.yaml</span><span class="yaml-badge yb-deploy">Deployment</span><span class="yaml-badge yb-service">NodePort</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">apps/v1</span>
+<span class="k">kind:</span> <span class="v">Deployment</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">vote</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">replicas:</span> <span class="v">2</span>          <span class="c"># 2 réplicas — load balancing automático</span>
+  <span class="k">selector:</span>
+    <span class="k">matchLabels:</span>
+      <span class="k">app:</span> <span class="v">vote</span>
+  <span class="k">template:</span>
+    <span class="k">metadata:</span>
+      <span class="k">labels:</span>
+        <span class="k">app:</span> <span class="v">vote</span>
+    <span class="k">spec:</span>
+      <span class="k">containers:</span>
+      - <span class="k">name:</span> <span class="v">vote</span>
+        <span class="k">image:</span> <span class="v">dockersamples/examplevotingapp_vote</span>
+        <span class="k">ports:</span>
+        - <span class="k">containerPort:</span> <span class="v">80</span>
+---
+<span class="k">apiVersion:</span> <span class="v">v1</span>
+<span class="k">kind:</span> <span class="v">Service</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">vote</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">type:</span> <span class="v">NodePort</span>
+  <span class="k">selector:</span>
+    <span class="k">app:</span> <span class="v">vote</span>
+  <span class="k">ports:</span>
+  - <span class="k">port:</span> <span class="v">80</span>
+    <span class="k">targetPort:</span> <span class="v">80</span>
+    <span class="k">nodePort:</span> <span class="v">30000</span>    <span class="c"># mapeado para localhost:8080 no k3d</span></div>
+  </div>
+
+  <div class="yaml-block">
+    <div class="yaml-header"><span class="yaml-filename">k8s/result-deployment.yaml</span><span class="yaml-badge yb-deploy">Deployment</span><span class="yaml-badge yb-service">NodePort</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">apps/v1</span>
+<span class="k">kind:</span> <span class="v">Deployment</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">result</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">replicas:</span> <span class="v">1</span>
+  <span class="k">selector:</span>
+    <span class="k">matchLabels:</span>
+      <span class="k">app:</span> <span class="v">result</span>
+  <span class="k">template:</span>
+    <span class="k">metadata:</span>
+      <span class="k">labels:</span>
+        <span class="k">app:</span> <span class="v">result</span>
+    <span class="k">spec:</span>
+      <span class="k">containers:</span>
+      - <span class="k">name:</span> <span class="v">result</span>
+        <span class="k">image:</span> <span class="v">dockersamples/examplevotingapp_result</span>
+        <span class="k">ports:</span>
+        - <span class="k">containerPort:</span> <span class="v">80</span>
+---
+<span class="k">apiVersion:</span> <span class="v">v1</span>
+<span class="k">kind:</span> <span class="v">Service</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">result</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">type:</span> <span class="v">NodePort</span>
+  <span class="k">selector:</span>
+    <span class="k">app:</span> <span class="v">result</span>
+  <span class="k">ports:</span>
+  - <span class="k">port:</span> <span class="v">80</span>
+    <span class="k">targetPort:</span> <span class="v">80</span>
+    <span class="k">nodePort:</span> <span class="v">30001</span>    <span class="c"># mapeado para localhost:8081 no k3d</span></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body">kubectl apply -f k8s/vote-deployment.yaml
+kubectl apply -f k8s/result-deployment.yaml
+
+<span class="comment"># ver todos os pods do namespace</span>
+kubectl get pods -n voteapp
+
+<span class="comment"># esperar tudo Running (pode demorar na primeira vez — pull das imagens)</span>
+kubectl get pods -n voteapp -w</div>
+  </div>
+
+  <div class="nav-row"><button class="nav-btn" onclick="go(6)">← anterior</button><button class="nav-btn primary" onclick="go(8)">próximo →</button></div>
+</div>
+
+<!-- STEP 9 -->
+<div class="panel" id="p8">
+  <p class="panel-title">Acessar e explorar</p>
+  <p class="panel-sub">Com todos os pods Running, a aplicação está disponível no browser. Esta etapa também traz comandos de exploração que os alunos devem executar e documentar.</p>
+
+  <div class="slabel">Acessar no browser</div>
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">URLs</span></div>
+    <div class="cmd-body"><span class="hl">http://localhost:8080</span>  → vote (Python)
+<span class="hl">http://localhost:8081</span>  → result (Node.js)</div>
+  </div>
+
+  <div class="slabel">Exploração guiada — rodar e observar</div>
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body"><span class="comment"># visão geral de todos os recursos</span>
+kubectl get all -n voteapp
+
+<span class="comment"># ver detalhes de um pod (scheduling, eventos, volumes)</span>
+kubectl describe pod -l app=vote -n voteapp
+
+<span class="comment"># entrar dentro de um container</span>
+kubectl exec -it deployment/redis -n voteapp -- redis-cli LRANGE votes 0 -1
+
+<span class="comment"># escalar vote para 3 réplicas e observar load balancing</span>
+kubectl scale deployment vote --replicas=3 -n voteapp
+
+<span class="comment"># matar um pod e ver o Deployment recriar automaticamente</span>
+kubectl delete pod -l app=vote -n voteapp --wait=false
+kubectl get pods -n voteapp -w
+
+<span class="comment"># ver logs de todos os pods do worker</span>
+kubectl logs -l app=worker -n voteapp --tail=20</div>
+  </div>
+
+  <div class="slabel">Limpar tudo</div>
+  <div class="cmd-block">
+    <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+    <div class="cmd-body"><span class="comment"># remove todos os recursos do namespace</span>
+kubectl delete namespace voteapp
+
+<span class="comment"># ou para destruir o cluster inteiro</span>
+k3d cluster delete voteapp</div>
+  </div>
+
+  <div class="verify">
+    <div class="verify-title">Checklist final — o que os alunos devem conseguir explicar</div>
+    <ul>
+      <li>Por que o worker não tem Service?</li>
+      <li>O que acontece se deletar o pod do Redis?</li>
+      <li>Por que vote tem 2 réplicas e result só 1?</li>
+      <li>Qual a diferença entre ClusterIP e NodePort?</li>
+      <li>O que o PVC garante que um volume comum não garante?</li>
+    </ul>
+  </div>
+
+  <div class="nav-row"><button class="nav-btn" onclick="go(7)">← anterior</button><button class="nav-btn" disabled>último passo</button></div>
+</div>
+
+</div>
+
+<script>
+let cur = 0;
+const total = 9;
+function go(n) {
+  document.getElementById('p' + cur).classList.remove('active');
+  document.querySelectorAll('.step-btn')[cur].classList.remove('active');
+  if (n > cur) document.querySelectorAll('.step-btn')[cur].classList.add('done');
+  cur = n;
+  document.getElementById('p' + cur).classList.add('active');
+  document.querySelectorAll('.step-btn')[cur].classList.add('active');
+}
+function cp(btn) {
+  const body = btn.closest('.cmd-block, .yaml-block').querySelector('.cmd-body, .yaml-body');
+  navigator.clipboard.writeText(body.innerText).then(() => {
+    btn.textContent = 'copiado!';
+    setTimeout(() => btn.textContent = 'copiar', 1500);
+  });
+}
+</script>

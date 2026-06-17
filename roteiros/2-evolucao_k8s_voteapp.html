@@ -1,0 +1,809 @@
+
+<style>
+.guide { max-width: 860px; padding: 1rem 0 2rem; }
+
+/* top nav — módulos */
+.mod-nav { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.mod-btn { font-family: var(--font-sans); font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.mod-btn:hover { background: var(--color-background-secondary); }
+.mod-btn.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+.mod-btn .mnum { opacity: 0.5; margin-right: 5px; }
+
+/* step nav within module */
+.steps-nav { display: flex; gap: 0; margin-bottom: 1.5rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+.step-btn { flex: 1; padding: 9px 4px; font-size: 11px; font-family: var(--font-sans); font-weight: 500; background: var(--color-background-primary); color: var(--color-text-tertiary); border: none; border-right: 0.5px solid var(--color-border-tertiary); cursor: pointer; }
+.step-btn:last-child { border-right: none; }
+.step-btn:hover { background: var(--color-background-secondary); }
+.step-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.step-btn.done { color: #1D9E75; }
+.step-btn .snum { display: block; font-size: 15px; font-weight: 500; margin-bottom: 2px; }
+
+/* panels */
+.mod-panel { display: none; }
+.mod-panel.active { display: block; }
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+
+/* typography */
+.panel-title { font-family: var(--font-sans); font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+.panel-sub { font-family: var(--font-sans); font-size: 13px; color: var(--color-text-secondary); margin: 0 0 1.4rem; line-height: 1.6; }
+.slabel { font-family: var(--font-sans); font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.07em; margin: 1.4rem 0 7px; }
+
+/* concept */
+.concept { background: var(--color-background-secondary); border-left: 3px solid #7F77DD; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 11px 15px; margin-bottom: 1.2rem; font-family: var(--font-sans); font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.concept strong { color: var(--color-text-primary); font-weight: 500; }
+.concept.green { border-left-color: #1D9E75; }
+.concept.amber { border-left-color: #BA7517; }
+.concept.coral { border-left-color: #D85A30; }
+
+/* code blocks */
+.cmd-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); margin-bottom: 10px; overflow: hidden; }
+.cmd-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.cmd-label { font-family: var(--font-sans); font-size: 11px; color: var(--color-text-tertiary); }
+.copy-btn { font-family: var(--font-sans); font-size: 11px; color: var(--color-text-secondary); background: none; border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+.copy-btn:hover { background: var(--color-background-primary); }
+.cmd-body { padding: 10px 14px; font-size: 12px; line-height: 1.75; color: var(--color-text-primary); white-space: pre; overflow-x: auto; font-family: var(--font-mono, monospace); }
+.cmd-body .c { color: var(--color-text-tertiary); }
+.cmd-body .hl { color: #1D9E75; }
+.cmd-body .warn { color: #BA7517; }
+
+/* yaml */
+.yaml-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); margin-bottom: 12px; overflow: hidden; }
+.yaml-header { display: flex; align-items: center; gap: 6px; justify-content: space-between; padding: 5px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.yaml-filename { font-size: 12px; font-weight: 500; color: var(--color-text-primary); font-family: var(--font-mono, monospace); }
+.yaml-badges { display: flex; gap: 4px; align-items: center; }
+.yb { font-family: var(--font-sans); font-size: 10px; padding: 2px 7px; border-radius: 10px; }
+.yb-hpa { background: #EEEDFE; color: #534AB7; }
+.yb-ing { background: #EAF3DE; color: #3B6D11; }
+.yb-prom { background: #FAEEDA; color: #854F0B; }
+.yb-graf { background: #E1F5EE; color: #0F6E56; }
+.yb-roll { background: #FAECE7; color: #993C1D; }
+.yb-deploy { background: #E6F1FB; color: #185FA5; }
+.yb-svc { background: #EAF3DE; color: #3B6D11; }
+.yaml-body { padding: 10px 14px; font-size: 12px; line-height: 1.75; color: var(--color-text-primary); white-space: pre; overflow-x: auto; font-family: var(--font-mono, monospace); }
+.yaml-body .k { color: #7F77DD; }
+.yaml-body .v { color: #1D9E75; }
+.yaml-body .c { color: var(--color-text-tertiary); }
+.yaml-body .s { color: #D85A30; }
+
+/* verify */
+.verify { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px 16px; margin-top: 1rem; font-family: var(--font-sans); }
+.verify-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 8px; }
+.verify ul { margin: 0; padding-left: 1.1rem; font-size: 13px; color: var(--color-text-secondary); line-height: 1.8; }
+.verify ul li::marker { color: #1D9E75; }
+
+/* nav */
+.nav-row { display: flex; justify-content: space-between; margin-top: 1.8rem; }
+.nav-btn { font-family: var(--font-sans); font-size: 13px; padding: 8px 18px; border-radius: var(--border-radius-md); cursor: pointer; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); }
+.nav-btn:hover { background: var(--color-background-secondary); }
+.nav-btn.primary { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* module badge */
+.mod-badge { display: inline-block; font-family: var(--font-sans); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+.mb-1 { background: #EEEDFE; color: #534AB7; }
+.mb-2 { background: #EAF3DE; color: #3B6D11; }
+.mb-3 { background: #FAEEDA; color: #854F0B; }
+.mb-4 { background: #FAECE7; color: #993C1D; }
+</style>
+
+<div class="guide">
+
+<!-- MODULE NAV -->
+<div class="mod-nav">
+  <button class="mod-btn active" onclick="goMod(0)"><span class="mnum">01</span>HPA — Autoescalonador</button>
+  <button class="mod-btn" onclick="goMod(1)"><span class="mnum">02</span>Ingress</button>
+  <button class="mod-btn" onclick="goMod(2)"><span class="mnum">03</span>Prometheus + Grafana</button>
+  <button class="mod-btn" onclick="goMod(3)"><span class="mnum">04</span>Rollout zero-downtime</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════ MODULE 1: HPA -->
+<div class="mod-panel active" id="mod0">
+  <div class="steps-nav" id="nav-m0">
+    <button class="step-btn active" onclick="goStep(0,0)"><span class="snum">1</span>Conceito</button>
+    <button class="step-btn" onclick="goStep(0,1)"><span class="snum">2</span>Metrics Server</button>
+    <button class="step-btn" onclick="goStep(0,2)"><span class="snum">3</span>Resource limits</button>
+    <button class="step-btn" onclick="goStep(0,3)"><span class="snum">4</span>HPA manifest</button>
+    <button class="step-btn" onclick="goStep(0,4)"><span class="snum">5</span>Teste de carga</button>
+  </div>
+
+  <div class="step-panel active" id="m0s0">
+    <span class="mod-badge mb-1">Módulo 1 — HPA</span>
+    <p class="panel-title">Horizontal Pod Autoscaler</p>
+    <p class="panel-sub">O HPA observa o consumo de CPU (ou memória) dos pods e aumenta/diminui automaticamente o número de réplicas para manter o uso dentro de um alvo. Quando a carga cai, ele também reduz as réplicas — economia de recursos.</p>
+    <div class="concept">
+      <strong>Como funciona.</strong> O HPA consulta o Metrics Server a cada 15s. Se a CPU média dos pods ultrapassar o alvo (ex: 50%), ele calcula quantas réplicas são necessárias e atualiza o Deployment. O Deployment então cria ou remove pods gradualmente.
+    </div>
+    <div class="concept green">
+      <strong>Pré-requisito fundamental.</strong> O HPA só consegue tomar decisões se os containers declaram <code>resources.requests.cpu</code>. Sem isso, o Metrics Server não tem base para calcular "% de uso". Faremos isso no passo 3.
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(0,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m0s1">
+    <span class="mod-badge mb-1">Módulo 1 — HPA</span>
+    <p class="panel-title">Instalar o Metrics Server</p>
+    <p class="panel-sub">O k3d não vem com o Metrics Server ativo por padrão. É ele que coleta CPU e memória dos pods e alimenta o HPA.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># instala o metrics-server com flag para k3d (TLS insecure)</span>
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+<span class="c"># k3d precisa do patch para desabilitar verificação TLS interna</span>
+kubectl patch deployment metrics-server \
+  -n kube-system \
+  --type=json \
+  -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+
+<span class="c"># aguardar o pod ficar pronto (~30s)</span>
+kubectl rollout status deployment/metrics-server -n kube-system
+
+<span class="c"># validar: deve mostrar CPU e memória dos nós</span>
+kubectl top nodes</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(0,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(0,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m0s2">
+    <span class="mod-badge mb-1">Módulo 1 — HPA</span>
+    <p class="panel-title">Adicionar resource limits ao Vote</p>
+    <p class="panel-sub">Atualizar o Deployment do <code>vote</code> com <code>requests</code> e <code>limits</code> de CPU. O HPA usa o <code>request</code> como denominador para calcular o percentual de uso.</p>
+    <div class="yaml-block">
+      <div class="yaml-header"><span class="yaml-filename">k8s/vote-deployment.yaml</span><div class="yaml-badges"><span class="yb yb-hpa">atualizado</span><button class="copy-btn" onclick="cp(this)">copiar</button></div></div>
+      <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">apps/v1</span>
+<span class="k">kind:</span> <span class="v">Deployment</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">vote</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">replicas:</span> <span class="v">1</span>          <span class="c"># HPA vai controlar; começamos com 1</span>
+  <span class="k">selector:</span>
+    <span class="k">matchLabels:</span>
+      <span class="k">app:</span> <span class="v">vote</span>
+  <span class="k">template:</span>
+    <span class="k">metadata:</span>
+      <span class="k">labels:</span>
+        <span class="k">app:</span> <span class="v">vote</span>
+    <span class="k">spec:</span>
+      <span class="k">containers:</span>
+      - <span class="k">name:</span> <span class="v">vote</span>
+        <span class="k">image:</span> <span class="v">dockersamples/examplevotingapp_vote</span>
+        <span class="k">ports:</span>
+        - <span class="k">containerPort:</span> <span class="v">80</span>
+        <span class="k">resources:</span>
+          <span class="k">requests:</span>
+            <span class="k">cpu:</span> <span class="s">"100m"</span>    <span class="c"># 0.1 vCPU — base para o HPA calcular %</span>
+            <span class="k">memory:</span> <span class="s">"64Mi"</span>
+          <span class="k">limits:</span>
+            <span class="k">cpu:</span> <span class="s">"300m"</span>    <span class="c"># máximo 0.3 vCPU por pod</span>
+            <span class="k">memory:</span> <span class="s">"128Mi"</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">kubectl apply -f k8s/vote-deployment.yaml
+kubectl top pods -n voteapp   <span class="c"># deve mostrar CPU do pod vote</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(0,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(0,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m0s3">
+    <span class="mod-badge mb-1">Módulo 1 — HPA</span>
+    <p class="panel-title">Criar o HPA</p>
+    <p class="panel-sub">O HPA mantém entre 1 e 5 réplicas do <code>vote</code>, escalando quando a CPU média ultrapassar 50% do request declarado.</p>
+    <div class="yaml-block">
+      <div class="yaml-header"><span class="yaml-filename">k8s/vote-hpa.yaml</span><div class="yaml-badges"><span class="yb yb-hpa">HPA</span><button class="copy-btn" onclick="cp(this)">copiar</button></div></div>
+      <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">autoscaling/v2</span>
+<span class="k">kind:</span> <span class="v">HorizontalPodAutoscaler</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">vote-hpa</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">scaleTargetRef:</span>
+    <span class="k">apiVersion:</span> <span class="v">apps/v1</span>
+    <span class="k">kind:</span> <span class="v">Deployment</span>
+    <span class="k">name:</span> <span class="v">vote</span>
+  <span class="k">minReplicas:</span> <span class="v">1</span>
+  <span class="k">maxReplicas:</span> <span class="v">5</span>
+  <span class="k">metrics:</span>
+  - <span class="k">type:</span> <span class="v">Resource</span>
+    <span class="k">resource:</span>
+      <span class="k">name:</span> <span class="v">cpu</span>
+      <span class="k">target:</span>
+        <span class="k">type:</span> <span class="v">Utilization</span>
+        <span class="k">averageUtilization:</span> <span class="v">50</span>   <span class="c"># escala se CPU > 50% do request</span>
+  <span class="k">behavior:</span>
+    <span class="k">scaleDown:</span>
+      <span class="k">stabilizationWindowSeconds:</span> <span class="v">60</span>   <span class="c"># aguarda 60s antes de reduzir</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">kubectl apply -f k8s/vote-hpa.yaml
+
+<span class="c"># observar o HPA em tempo real</span>
+kubectl get hpa -n voteapp -w
+
+<span class="c"># saída esperada (sem carga):
+# NAME       REFERENCE         TARGETS   MINPODS   MAXPODS   REPLICAS
+# vote-hpa   Deployment/vote   8%/50%    1         5         1</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(0,2)">← anterior</button><button class="nav-btn primary" onclick="goStep(0,4)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m0s4">
+    <span class="mod-badge mb-1">Módulo 1 — HPA</span>
+    <p class="panel-title">Simular carga e observar escalonamento</p>
+    <p class="panel-sub">Usamos um pod temporário com <code>hey</code> (gerador de carga HTTP) para estressar o serviço <code>vote</code> e assistir o HPA criar réplicas em tempo real.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal 1 — gerar carga</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># sobe um pod com hey e dispara 200 req/s por 120s</span>
+kubectl run load-generator \
+  --image=williamyeh/hey \
+  --restart=Never \
+  -n voteapp \
+  -- -z 120s -c 50 -q 100 http://vote.voteapp.svc.cluster.local/
+
+<span class="c"># acompanhar criação dos pods em tempo real</span>
+kubectl get pods -n voteapp -w</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal 2 — observar HPA</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># watch no HPA — atualiza a cada 5s</span>
+watch -n5 "kubectl get hpa vote-hpa -n voteapp && \
+           kubectl top pods -n voteapp -l app=vote"
+
+<span class="c"># após a carga terminar: HPA reduz para 1 réplica (~60-90s)</span>
+kubectl delete pod load-generator -n voteapp</div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">O que observar e documentar</div>
+      <ul>
+        <li>Quantos segundos levou para o HPA criar a 2ª réplica?</li>
+        <li>Qual foi o pico de réplicas atingido?</li>
+        <li>Após remover a carga, quanto tempo levou para escalar de volta a 1?</li>
+        <li>Por que o <code>stabilizationWindowSeconds</code> existe?</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(0,3)">← anterior</button><button class="nav-btn" onclick="goMod(1)" style="background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary);padding:8px 18px;border-radius:var(--border-radius-md);font-family:var(--font-sans);font-size:13px;cursor:pointer;border:none;">próximo módulo →</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ MODULE 2: INGRESS -->
+<div class="mod-panel" id="mod1">
+  <div class="steps-nav" id="nav-m1">
+    <button class="step-btn active" onclick="goStep(1,0)"><span class="snum">1</span>Conceito</button>
+    <button class="step-btn" onclick="goStep(1,1)"><span class="snum">2</span>Traefik no k3d</button>
+    <button class="step-btn" onclick="goStep(1,2)"><span class="snum">3</span>Ingress manifest</button>
+    <button class="step-btn" onclick="goStep(1,3)"><span class="snum">4</span>Hosts locais</span></button>
+    <button class="step-btn" onclick="goStep(1,4)"><span class="snum">5</span>Verificação</button>
+  </div>
+
+  <div class="step-panel active" id="m1s0">
+    <span class="mod-badge mb-2">Módulo 2 — Ingress</span>
+    <p class="panel-title">Ingress Controller</p>
+    <p class="panel-sub">Até aqui usamos NodePort — funciona, mas é primitivo: cada serviço precisa de uma porta diferente. O Ingress centraliza o tráfego HTTP/HTTPS numa porta 80/443 e roteia por hostname ou path.</p>
+    <div class="concept green">
+      <strong>k3d já vem com Traefik.</strong> Ao criar o cluster, o k3d sobe o Traefik automaticamente como Ingress Controller. Não precisa instalar nada — só precisamos recriar o cluster com a porta 80 mapeada.
+    </div>
+    <div class="concept amber">
+      <strong>Mudança no cluster.</strong> O cluster atual foi criado com portas 8080/8081. Vamos recriá-lo com a porta 80 mapeada para o load balancer do Traefik. Os manifests anteriores continuam válidos.
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(1,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m1s1">
+    <span class="mod-badge mb-2">Módulo 2 — Ingress</span>
+    <p class="panel-title">Recriar cluster com porta 80</p>
+    <p class="panel-sub">Destruímos o cluster anterior e criamos um novo com as portas corretas para o Ingress funcionar.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># remover cluster anterior</span>
+k3d cluster delete voteapp
+
+<span class="c"># criar novo cluster com porta 80 → Traefik ingress</span>
+k3d cluster create voteapp \
+  --servers 1 \
+  --agents 2 \
+  --port <span class="hl">80:80@loadbalancer</span> \
+  --port <span class="hl">443:443@loadbalancer</span>
+
+<span class="c"># reaplicar todos os manifests anteriores</span>
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/postgres-secret.yaml
+kubectl apply -f k8s/redis-deployment.yaml
+kubectl apply -f k8s/postgres-deployment.yaml
+kubectl apply -f k8s/worker-deployment.yaml
+kubectl apply -f k8s/vote-deployment.yaml
+kubectl apply -f k8s/result-deployment.yaml
+kubectl apply -f k8s/vote-hpa.yaml
+
+<span class="c"># verificar Traefik rodando</span>
+kubectl get pods -n kube-system | grep traefik</div>
+    </div>
+    <div class="concept">
+      <strong>Services agora como ClusterIP.</strong> Com Ingress, os serviços <code>vote</code> e <code>result</code> não precisam mais ser NodePort. Altere o <code>type: NodePort</code> para <code>type: ClusterIP</code> e remova o campo <code>nodePort:</code> nos dois manifests antes de reaplicar.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(1,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(1,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m1s2">
+    <span class="mod-badge mb-2">Módulo 2 — Ingress</span>
+    <p class="panel-title">Criar o recurso Ingress</p>
+    <p class="panel-sub">Um único manifest Ingress define as regras de roteamento: <code>vote.local</code> vai para o serviço vote, <code>result.local</code> vai para o result.</p>
+    <div class="yaml-block">
+      <div class="yaml-header"><span class="yaml-filename">k8s/ingress.yaml</span><div class="yaml-badges"><span class="yb yb-ing">Ingress</span><button class="copy-btn" onclick="cp(this)">copiar</button></div></div>
+      <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">networking.k8s.io/v1</span>
+<span class="k">kind:</span> <span class="v">Ingress</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">voteapp-ingress</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+  <span class="k">annotations:</span>
+    <span class="k">traefik.ingress.kubernetes.io/router.entrypoints:</span> <span class="s">web</span>
+<span class="k">spec:</span>
+  <span class="k">rules:</span>
+  - <span class="k">host:</span> <span class="v">vote.local</span>          <span class="c"># http://vote.local → serviço vote</span>
+    <span class="k">http:</span>
+      <span class="k">paths:</span>
+      - <span class="k">path:</span> <span class="v">/</span>
+        <span class="k">pathType:</span> <span class="v">Prefix</span>
+        <span class="k">backend:</span>
+          <span class="k">service:</span>
+            <span class="k">name:</span> <span class="v">vote</span>
+            <span class="k">port:</span>
+              <span class="k">number:</span> <span class="v">80</span>
+  - <span class="k">host:</span> <span class="v">result.local</span>        <span class="c"># http://result.local → serviço result</span>
+    <span class="k">http:</span>
+      <span class="k">paths:</span>
+      - <span class="k">path:</span> <span class="v">/</span>
+        <span class="k">pathType:</span> <span class="v">Prefix</span>
+        <span class="k">backend:</span>
+          <span class="k">service:</span>
+            <span class="k">name:</span> <span class="v">result</span>
+            <span class="k">port:</span>
+              <span class="k">number:</span> <span class="v">80</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">kubectl apply -f k8s/ingress.yaml
+kubectl get ingress -n voteapp</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(1,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(1,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m1s3">
+    <span class="mod-badge mb-2">Módulo 2 — Ingress</span>
+    <p class="panel-title">Configurar hosts locais</p>
+    <p class="panel-sub">Para que <code>vote.local</code> e <code>result.local</code> resolvam para o cluster local, precisamos adicionar entradas no <code>/etc/hosts</code> da máquina.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal — Linux / macOS</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># adicionar ao /etc/hosts (requer sudo)</span>
+echo "127.0.0.1  vote.local result.local" | sudo tee -a /etc/hosts
+
+<span class="c"># verificar</span>
+ping -c1 vote.local   <span class="c"># deve responder de 127.0.0.1</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">Windows (PowerShell como Administrador)</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">Add-Content C:\Windows\System32\drivers\etc\hosts "127.0.0.1  vote.local result.local"</div>
+    </div>
+    <div class="concept amber">
+      <strong>Em lab com máquinas compartilhadas.</strong> Basta editar o hosts uma vez por máquina. Se o laboratório usar VMs, o IP deve ser o da VM, não 127.0.0.1.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(1,2)">← anterior</button><button class="nav-btn primary" onclick="goStep(1,4)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m1s4">
+    <span class="mod-badge mb-2">Módulo 2 — Ingress</span>
+    <p class="panel-title">Verificação e exploração</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># testar via curl</span>
+curl -s -o /dev/null -w "%{http_code}" http://vote.local      <span class="c"># deve retornar 200</span>
+curl -s -o /dev/null -w "%{http_code}" http://result.local    <span class="c"># deve retornar 200</span>
+
+<span class="c"># ver as rotas que o Traefik registrou</span>
+kubectl get ingressroute,ingress -A
+
+<span class="c"># dashboard do Traefik (porta 9000 via port-forward)</span>
+kubectl port-forward -n kube-system \
+  $(kubectl get pods -n kube-system -l app.kubernetes.io/name=traefik -o name) \
+  9000:9000 &
+<span class="c"># abrir: http://localhost:9000/dashboard/</span></div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">O que explorar</div>
+      <ul>
+        <li>Browser em <code>http://vote.local</code> e <code>http://result.local</code></li>
+        <li>Dashboard do Traefik mostrando as rotas registradas</li>
+        <li>O que acontece se tentar acessar <code>http://localhost</code> sem host header?</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(1,3)">← anterior</button><button class="nav-btn" onclick="goMod(2)" style="background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary);padding:8px 18px;border-radius:var(--border-radius-md);font-family:var(--font-sans);font-size:13px;cursor:pointer;border:none;">próximo módulo →</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ MODULE 3: PROMETHEUS + GRAFANA -->
+<div class="mod-panel" id="mod2">
+  <div class="steps-nav" id="nav-m2">
+    <button class="step-btn active" onclick="goStep(2,0)"><span class="snum">1</span>Conceito</button>
+    <button class="step-btn" onclick="goStep(2,1)"><span class="snum">2</span>Instalar stack</button>
+    <button class="step-btn" onclick="goStep(2,2)"><span class="snum">3</span>Anotações</button>
+    <button class="step-btn" onclick="goStep(2,3)"><span class="snum">4</span>Grafana</button>
+    <button class="step-btn" onclick="goStep(2,4)"><span class="snum">5</span>Dashboard</button>
+  </div>
+
+  <div class="step-panel active" id="m2s0">
+    <span class="mod-badge mb-3">Módulo 3 — Prometheus + Grafana</span>
+    <p class="panel-title">Monitoramento com Prometheus e Grafana</p>
+    <p class="panel-sub">Prometheus coleta métricas (CPU, memória, requisições) dos pods via scrape. Grafana visualiza essas métricas em dashboards. Juntos formam o stack de observabilidade mais usado em Kubernetes.</p>
+    <div class="concept amber">
+      <strong>Arquitetura.</strong> Prometheus descobre os pods automaticamente via labels e faz scrape do endpoint <code>/metrics</code> de cada um. O Grafana consulta o Prometheus via PromQL e renderiza gráficos. Nenhuma modificação no código da aplicação é necessária para métricas de infraestrutura.
+    </div>
+    <div class="concept">
+      <strong>Instalação via Helm.</strong> Usaremos o chart <code>kube-prometheus-stack</code> — instala Prometheus, Grafana, Alertmanager e um conjunto de dashboards pré-configurados para Kubernetes em um único comando.
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(2,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m2s1">
+    <span class="mod-badge mb-3">Módulo 3 — Prometheus + Grafana</span>
+    <p class="panel-title">Instalar kube-prometheus-stack via Helm</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal — instalar Helm (se necessário)</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># Linux / macOS</span>
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+<span class="c"># Windows</span>
+winget install Helm.Helm</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal — instalar o stack</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># adicionar repositório</span>
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+<span class="c"># criar namespace de monitoramento</span>
+kubectl create namespace monitoring
+
+<span class="c"># instalar o stack (configuração mínima para k3d)</span>
+helm install kube-prometheus-stack \
+  prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --set grafana.adminPassword=admin123 \
+  --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \
+  --set alertmanager.enabled=false
+
+<span class="c"># aguardar os pods (pode levar ~2 min)</span>
+kubectl get pods -n monitoring -w</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(2,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(2,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m2s2">
+    <span class="mod-badge mb-3">Módulo 3 — Prometheus + Grafana</span>
+    <p class="panel-title">ServiceMonitor para o voteapp</p>
+    <p class="panel-sub">Para o Prometheus scrape os pods do voteapp, criamos um <code>ServiceMonitor</code> — recurso que diz ao Prometheus quais Services monitorar e em qual porta/path estão as métricas.</p>
+    <div class="yaml-block">
+      <div class="yaml-header"><span class="yaml-filename">k8s/servicemonitor.yaml</span><div class="yaml-badges"><span class="yb yb-prom">ServiceMonitor</span><button class="copy-btn" onclick="cp(this)">copiar</button></div></div>
+      <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">monitoring.coreos.com/v1</span>
+<span class="k">kind:</span> <span class="v">ServiceMonitor</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">voteapp-monitor</span>
+  <span class="k">namespace:</span> <span class="v">monitoring</span>
+  <span class="k">labels:</span>
+    <span class="k">release:</span> <span class="v">kube-prometheus-stack</span>   <span class="c"># label que o Prometheus procura</span>
+<span class="k">spec:</span>
+  <span class="k">namespaceSelector:</span>
+    <span class="k">matchNames:</span>
+    - <span class="v">voteapp</span>
+  <span class="k">selector:</span>
+    <span class="k">matchLabels:</span>
+      <span class="k">app:</span> <span class="v">vote</span>                        <span class="c"># seleciona pods com label app=vote</span>
+  <span class="k">endpoints:</span>
+  - <span class="k">port:</span> <span class="v">http</span>
+    <span class="k">path:</span> <span class="v">/metrics</span>
+    <span class="k">interval:</span> <span class="v">15s</span></div>
+    </div>
+    <div class="concept green">
+      <strong>Métricas de infra sem modificar código.</strong> Mesmo sem um <code>/metrics</code> na aplicação, o Prometheus coleta métricas de CPU, memória e rede via <code>kube-state-metrics</code> e <code>node-exporter</code> que já vieram no stack. O ServiceMonitor acima é opcional — os dashboards do Kubernetes já funcionam.
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">kubectl apply -f k8s/servicemonitor.yaml</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(2,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(2,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m2s3">
+    <span class="mod-badge mb-3">Módulo 3 — Prometheus + Grafana</span>
+    <p class="panel-title">Acessar Grafana e Prometheus</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal — port-forward Grafana</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># Grafana na porta 3000</span>
+kubectl port-forward -n monitoring \
+  svc/kube-prometheus-stack-grafana 3000:80 &
+
+<span class="c"># abrir: http://localhost:3000
+# login: admin / admin123</span>
+
+<span class="c"># Prometheus na porta 9090</span>
+kubectl port-forward -n monitoring \
+  svc/kube-prometheus-stack-prometheus 9090:9090 &
+
+<span class="c"># abrir: http://localhost:9090</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">PromQL — queries para explorar no Prometheus</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># CPU dos pods do voteapp</span>
+rate(container_cpu_usage_seconds_total{namespace="voteapp"}[2m])
+
+<span class="c"># memória usada por container</span>
+container_memory_working_set_bytes{namespace="voteapp"}
+
+<span class="c"># número de pods rodando por deployment</span>
+kube_deployment_status_replicas_available{namespace="voteapp"}
+
+<span class="c"># restarts de containers</span>
+kube_pod_container_status_restarts_total{namespace="voteapp"}</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(2,2)">← anterior</button><button class="nav-btn primary" onclick="goStep(2,4)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m2s4">
+    <span class="mod-badge mb-3">Módulo 3 — Prometheus + Grafana</span>
+    <p class="panel-title">Dashboard de Kubernetes no Grafana</p>
+    <p class="panel-sub">O kube-prometheus-stack já instala dashboards prontos. Veja como importar um dashboard específico para o voteapp.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">passo a passo no Grafana</span></div>
+      <div class="cmd-body">1. Acesse http://localhost:3000 → Dashboards → Browse
+2. Explore os dashboards pré-instalados:
+   - "Kubernetes / Compute Resources / Namespace (Pods)"
+     → filtre por namespace: voteapp
+   - "Kubernetes / Compute Resources / Pod"
+     → veja CPU e memória de cada pod individualmente
+
+3. Para importar dashboard da comunidade (ID 6417 — K8s cluster):
+   Dashboards → Import → ID: 6417 → Load
+   → selecione Prometheus como data source → Import
+
+4. <span class="hl">Dica para aula:</span> rode o load-generator do módulo 1
+   enquanto o dashboard está aberto — os alunos veem
+   CPU subindo e réplicas sendo criadas em tempo real.</div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">Entregável sugerido</div>
+      <ul>
+        <li>Print do dashboard mostrando CPU dos pods do voteapp</li>
+        <li>Print do HPA escalando durante carga (réplicas > 1)</li>
+        <li>Print do Prometheus com uma query PromQL escolhida pela dupla</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(2,3)">← anterior</button><button class="nav-btn" onclick="goMod(3)" style="background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary);padding:8px 18px;border-radius:var(--border-radius-md);font-family:var(--font-sans);font-size:13px;cursor:pointer;border:none;">próximo módulo →</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ MODULE 4: ROLLOUT -->
+<div class="mod-panel" id="mod3">
+  <div class="steps-nav" id="nav-m3">
+    <button class="step-btn active" onclick="goStep(3,0)"><span class="snum">1</span>Conceito</button>
+    <button class="step-btn" onclick="goStep(3,1)"><span class="snum">2</span>Estratégia</button>
+    <button class="step-btn" onclick="goStep(3,2)"><span class="snum">3</span>Novo Dockerfile</button>
+    <button class="step-btn" onclick="goStep(3,3)"><span class="snum">4</span>Rollout</button>
+    <button class="step-btn" onclick="goStep(3,4)"><span class="snum">5</span>Rollback</button>
+  </div>
+
+  <div class="step-panel active" id="m3s0">
+    <span class="mod-badge mb-4">Módulo 4 — Rollout</span>
+    <p class="panel-title">Atualização contínua sem downtime</p>
+    <p class="panel-sub">Rolling update é a estratégia padrão do Kubernetes: ao atualizar a imagem, ele cria os novos pods antes de remover os antigos — garantindo que sempre há pelo menos uma réplica saudável servindo tráfego.</p>
+    <div class="concept coral">
+      <strong>O ciclo completo.</strong> Neste módulo a dupla vai: (1) modificar o código do serviço <code>vote</code>, (2) fazer build de uma imagem v2 e importar para o k3d, (3) atualizar o Deployment e observar o rollout, (4) simular uma falha e executar rollback para v1.
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(3,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m3s1">
+    <span class="mod-badge mb-4">Módulo 4 — Rollout</span>
+    <p class="panel-title">Configurar estratégia no Deployment</p>
+    <p class="panel-sub">Adicionamos a seção <code>strategy</code> ao Deployment do <code>vote</code> para controlar como o rollout acontece.</p>
+    <div class="yaml-block">
+      <div class="yaml-header"><span class="yaml-filename">k8s/vote-deployment.yaml</span><div class="yaml-badges"><span class="yb yb-roll">strategy adicionada</span><button class="copy-btn" onclick="cp(this)">copiar</button></div></div>
+      <div class="yaml-body"><span class="k">apiVersion:</span> <span class="v">apps/v1</span>
+<span class="k">kind:</span> <span class="v">Deployment</span>
+<span class="k">metadata:</span>
+  <span class="k">name:</span> <span class="v">vote</span>
+  <span class="k">namespace:</span> <span class="v">voteapp</span>
+<span class="k">spec:</span>
+  <span class="k">replicas:</span> <span class="v">3</span>
+  <span class="k">strategy:</span>
+    <span class="k">type:</span> <span class="v">RollingUpdate</span>
+    <span class="k">rollingUpdate:</span>
+      <span class="k">maxSurge:</span> <span class="v">1</span>        <span class="c"># cria 1 pod novo antes de remover antigo</span>
+      <span class="k">maxUnavailable:</span> <span class="v">0</span>  <span class="c"># zero pods indisponíveis durante o update</span>
+  <span class="k">selector:</span>
+    <span class="k">matchLabels:</span>
+      <span class="k">app:</span> <span class="v">vote</span>
+  <span class="k">template:</span>
+    <span class="k">metadata:</span>
+      <span class="k">labels:</span>
+        <span class="k">app:</span> <span class="v">vote</span>
+    <span class="k">spec:</span>
+      <span class="k">containers:</span>
+      - <span class="k">name:</span> <span class="v">vote</span>
+        <span class="k">image:</span> <span class="v">voteapp-vote:v1</span>   <span class="c"># imagem com tag explícita</span>
+        <span class="k">ports:</span>
+        - <span class="k">containerPort:</span> <span class="v">80</span>
+        <span class="k">readinessProbe:</span>         <span class="c"># k8s só roteia tráfego quando pronto</span>
+          <span class="k">httpGet:</span>
+            <span class="k">path:</span> <span class="v">/</span>
+            <span class="k">port:</span> <span class="v">80</span>
+          <span class="k">initialDelaySeconds:</span> <span class="v">5</span>
+          <span class="k">periodSeconds:</span> <span class="v">5</span>
+        <span class="k">resources:</span>
+          <span class="k">requests:</span>
+            <span class="k">cpu:</span> <span class="s">"100m"</span>
+            <span class="k">memory:</span> <span class="s">"64Mi"</span>
+          <span class="k">limits:</span>
+            <span class="k">cpu:</span> <span class="s">"300m"</span>
+            <span class="k">memory:</span> <span class="s">"128Mi"</span></div>
+    </div>
+    <div class="concept green">
+      <strong>readinessProbe é a chave do zero downtime.</strong> O k8s só remove um pod antigo depois que o novo pod passar na readinessProbe. Com <code>maxUnavailable: 0</code>, o Service nunca roteia para um pod não-pronto.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(3,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(3,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m3s2">
+    <span class="mod-badge mb-4">Módulo 4 — Rollout</span>
+    <p class="panel-title">Build da imagem v1 e v2</p>
+    <p class="panel-sub">Modificar o texto das opções de voto no código, fazer build local e importar para dentro do cluster k3d (que não acessa o registry local por padrão).</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal — build v1 (original)</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># build da imagem v1 a partir do Dockerfile do repositório</span>
+cd vote/
+docker build -t voteapp-vote:v1 .
+
+<span class="c"># importar para dentro do cluster k3d</span>
+k3d image import voteapp-vote:v1 -c voteapp</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">editar vote/app.py — criar v2</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># em app.py, localizar a linha com as opções e alterar:</span>
+<span class="warn"># v1: option_a = os.getenv('OPTION_A', "Cats")</span>
+<span class="warn"># v1: option_b = os.getenv('OPTION_B', "Dogs")</span>
+
+<span class="c"># v2: trocar para tema de linguagens</span>
+option_a = os.getenv('OPTION_A', <span class="hl">"Python"</span>)
+option_b = os.getenv('OPTION_B', <span class="hl">"JavaScript"</span>)</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal — build v2 e importar</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">docker build -t voteapp-vote:v2 .
+k3d image import voteapp-vote:v2 -c voteapp
+
+<span class="c"># verificar que as duas imagens estão disponíveis</span>
+docker images | grep voteapp-vote</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(3,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(3,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m3s3">
+    <span class="mod-badge mb-4">Módulo 4 — Rollout</span>
+    <p class="panel-title">Executar o rollout e observar</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal 1 — aplicar v1 e depois v2</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># aplicar deployment com imagem v1</span>
+kubectl apply -f k8s/vote-deployment.yaml
+
+<span class="c"># atualizar para v2 (uma única linha altera a imagem)</span>
+kubectl set image deployment/vote \
+  vote=voteapp-vote:v2 \
+  -n voteapp
+
+<span class="c"># ou: editar o yaml e reaplicar
+# kubectl apply -f k8s/vote-deployment.yaml</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal 2 — observar o rollout em tempo real</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># acompanhar pods sendo criados/terminados</span>
+kubectl get pods -n voteapp -w
+
+<span class="c"># status detalhado do rollout</span>
+kubectl rollout status deployment/vote -n voteapp
+
+<span class="c"># ver o histórico de versões</span>
+kubectl rollout history deployment/vote -n voteapp
+
+<span class="c"># durante o rollout: sempre há réplicas v1 e v2 ao mesmo tempo
+# maxUnavailable=0 garante que o serviço nunca para</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal 3 — teste contínuo durante o rollout</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># disparar requests a cada 1s durante o rollout</span>
+while true; do
+  STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://vote.local)
+  echo "$(date +%H:%M:%S) → HTTP $STATUS"
+  sleep 1
+done
+
+<span class="c"># todos devem retornar 200 — zero downtime comprovado</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(3,2)">← anterior</button><button class="nav-btn primary" onclick="goStep(3,4)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m3s4">
+    <span class="mod-badge mb-4">Módulo 4 — Rollout</span>
+    <p class="panel-title">Simular falha e executar rollback</p>
+    <p class="panel-sub">Simulamos um deploy com imagem inválida (v3-broken) e observamos o Kubernetes parar o rollout e manter a v2 saudável. Depois executamos rollback.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal — deploy com imagem que não existe</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># deploy v3 com imagem inválida</span>
+kubectl set image deployment/vote \
+  vote=voteapp-vote:v3-broken \
+  -n voteapp
+
+<span class="c"># observar: pods ficam em ImagePullBackOff</span>
+kubectl get pods -n voteapp -w
+
+<span class="c"># status mostra rollout travado</span>
+kubectl rollout status deployment/vote -n voteapp --timeout=30s
+<span class="c"># → "Waiting for deployment to finish: 1 out of 3 new replicas have been updated..."</span>
+
+<span class="c"># mas o serviço vote.local continua respondendo!
+# (os pods v2 antigos ainda estão ativos)</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal — rollback para versão anterior</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># voltar para a revisão anterior (v2)</span>
+kubectl rollout undo deployment/vote -n voteapp
+
+<span class="c"># ou voltar para uma revisão específica</span>
+kubectl rollout undo deployment/vote -n voteapp --to-revision=1
+
+<span class="c"># verificar que voltou para v2</span>
+kubectl rollout status deployment/vote -n voteapp
+kubectl get pods -n voteapp</div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">Checklist final dos 4 módulos</div>
+      <ul>
+        <li>HPA escalou automaticamente sob carga e reduziu quando a carga caiu</li>
+        <li>Aplicação acessível por hostname via Ingress (vote.local / result.local)</li>
+        <li>Grafana mostrando métricas de CPU e réplicas do namespace voteapp</li>
+        <li>Loop de curl não retornou nenhum erro durante o rolling update</li>
+        <li>Rollback executado com um único comando após deploy com imagem inválida</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(3,3)">← anterior</button><button class="nav-btn" disabled>fim do roteiro</button></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const modSteps = [0, 0, 0, 0];
+
+function goMod(m) {
+  document.querySelectorAll('.mod-panel').forEach((p,i) => p.classList.toggle('active', i===m));
+  document.querySelectorAll('.mod-btn').forEach((b,i) => b.classList.toggle('active', i===m));
+}
+
+function goStep(mod, step) {
+  const panels = document.querySelectorAll('#mod' + mod + ' .step-panel');
+  const btns = document.querySelectorAll('#nav-m' + mod + ' .step-btn');
+  panels.forEach((p,i) => p.classList.toggle('active', i===step));
+  btns.forEach((b,i) => {
+    b.classList.remove('active','done');
+    if(i===step) b.classList.add('active');
+    else if(i < step) b.classList.add('done');
+  });
+  modSteps[mod] = step;
+}
+
+function cp(btn) {
+  const body = btn.closest('.cmd-block, .yaml-block').querySelector('.cmd-body, .yaml-body');
+  navigator.clipboard.writeText(body.innerText).then(() => {
+    btn.textContent = 'copiado!';
+    setTimeout(() => btn.textContent = 'copiar', 1500);
+  });
+}
+</script>

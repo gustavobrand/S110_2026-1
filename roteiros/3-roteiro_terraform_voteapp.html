@@ -1,0 +1,977 @@
+
+<h2 class="sr-only">Roteiro pedagógico de Terraform para infraestrutura como código, sequência após Kubernetes com k3d</h2>
+<style>
+.wrap { max-width: 860px; padding: 1rem 0 2rem; }
+
+/* module nav */
+.mod-nav { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.mod-btn { font-family: var(--font-sans); font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.mod-btn:hover { background: var(--color-background-secondary); }
+.mod-btn.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+
+/* step nav */
+.steps-nav { display: flex; gap: 0; margin-bottom: 1.5rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+.step-btn { flex: 1; padding: 9px 4px; font-size: 11px; font-family: var(--font-sans); font-weight: 500; background: var(--color-background-primary); color: var(--color-text-tertiary); border: none; border-right: 0.5px solid var(--color-border-tertiary); cursor: pointer; }
+.step-btn:last-child { border-right: none; }
+.step-btn:hover { background: var(--color-background-secondary); }
+.step-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.step-btn.done { color: #1D9E75; }
+.step-btn .snum { display: block; font-size: 15px; font-weight: 500; margin-bottom: 2px; }
+
+/* panels */
+.mod-panel { display: none; }
+.mod-panel.active { display: block; }
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+
+/* typography */
+.panel-title { font-family: var(--font-sans); font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+.panel-sub { font-family: var(--font-sans); font-size: 13px; color: var(--color-text-secondary); margin: 0 0 1.4rem; line-height: 1.6; }
+.slabel { font-family: var(--font-sans); font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.07em; margin: 1.4rem 0 7px; }
+
+/* concept boxes */
+.concept { background: var(--color-background-secondary); border-left: 3px solid #7F77DD; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 11px 15px; margin-bottom: 1.2rem; font-family: var(--font-sans); font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.concept strong { color: var(--color-text-primary); font-weight: 500; }
+.concept.green { border-left-color: #1D9E75; }
+.concept.amber { border-left-color: #BA7517; }
+.concept.coral { border-left-color: #D85A30; }
+.concept.blue { border-left-color: #378ADD; }
+
+/* code */
+.cmd-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); margin-bottom: 10px; overflow: hidden; }
+.cmd-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.cmd-label { font-family: var(--font-sans); font-size: 11px; color: var(--color-text-tertiary); }
+.copy-btn { font-family: var(--font-sans); font-size: 11px; color: var(--color-text-secondary); background: none; border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+.copy-btn:hover { background: var(--color-background-primary); }
+.cmd-body { padding: 10px 14px; font-size: 12px; line-height: 1.75; color: var(--color-text-primary); white-space: pre; overflow-x: auto; font-family: var(--font-mono, monospace); }
+.cmd-body .c { color: var(--color-text-tertiary); }
+.cmd-body .hl { color: #1D9E75; }
+.cmd-body .warn { color: #BA7517; }
+.cmd-body .k { color: #7F77DD; }
+.cmd-body .v { color: #1D9E75; }
+.cmd-body .s { color: #D85A30; }
+
+/* verify */
+.verify { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px 16px; margin-top: 1rem; font-family: var(--font-sans); }
+.verify-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 8px; }
+.verify ul { margin: 0; padding-left: 1.1rem; font-size: 13px; color: var(--color-text-secondary); line-height: 1.8; }
+.verify ul li::marker { color: #1D9E75; }
+
+/* nav */
+.nav-row { display: flex; justify-content: space-between; margin-top: 1.8rem; }
+.nav-btn { font-family: var(--font-sans); font-size: 13px; padding: 8px 18px; border-radius: var(--border-radius-md); cursor: pointer; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); }
+.nav-btn:hover { background: var(--color-background-secondary); }
+.nav-btn.primary { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* badge */
+.mod-badge { display: inline-block; font-family: var(--font-sans); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+.mb-1 { background: #EEEDFE; color: #534AB7; }
+.mb-2 { background: #E1F5EE; color: #0F6E56; }
+.mb-3 { background: #FAEEDA; color: #854F0B; }
+.mb-4 { background: #FAECE7; color: #993C1D; }
+.mb-5 { background: #E6F1FB; color: #185FA5; }
+
+/* progression diagram inline */
+.prog { display: flex; align-items: center; gap: 0; margin: 1.2rem 0; flex-wrap: wrap; }
+.prog-item { font-family: var(--font-sans); font-size: 11px; font-weight: 500; padding: 7px 14px; border-radius: 20px; white-space: nowrap; }
+.prog-sep { font-size: 14px; color: var(--color-text-tertiary); margin: 0 4px; }
+.pi-done { background: var(--color-background-secondary); color: var(--color-text-tertiary); border: 0.5px solid var(--color-border-tertiary); }
+.pi-now { background: var(--color-text-primary); color: var(--color-background-primary); }
+.pi-next { background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-secondary); }
+</style>
+
+<div class="wrap">
+
+<!-- MODULE NAV -->
+<div class="mod-nav">
+  <button class="mod-btn active" onclick="goMod(0)">01 · Conceito IaC</button>
+  <button class="mod-btn" onclick="goMod(1)">02 · Terraform local</button>
+  <button class="mod-btn" onclick="goMod(2)">03 · Cluster k3d via Terraform</button>
+  <button class="mod-btn" onclick="goMod(3)">04 · Manifests k8s via Terraform</button>
+  <button class="mod-btn" onclick="goMod(4)">05 · CI/CD completo</button>
+</div>
+
+<!-- ══════════════════════════ MODULE 1: CONCEITO IaC -->
+<div class="mod-panel active" id="mod0">
+  <div class="steps-nav" id="nav-m0">
+    <button class="step-btn active" onclick="goStep(0,0)"><span class="snum">1</span>Posição</button>
+    <button class="step-btn" onclick="goStep(0,1)"><span class="snum">2</span>O que é IaC</button>
+    <button class="step-btn" onclick="goStep(0,2)"><span class="snum">3</span>Ferramentas</button>
+    <button class="step-btn" onclick="goStep(0,3)"><span class="snum">4</span>HCL básico</button>
+  </div>
+
+  <div class="step-panel active" id="m0s0">
+    <span class="mod-badge mb-1">Módulo 1 — Conceito IaC</span>
+    <p class="panel-title">Onde o Terraform se encaixa na disciplina</p>
+    <p class="panel-sub">Os alunos já viram containers, docker-compose e Kubernetes com k3d. O próximo passo natural é: e se toda essa infraestrutura fosse descrita em código, versionada no git e recriada com um único comando?</p>
+
+    <div class="prog">
+      <span class="prog-item pi-done">Docker + Compose</span>
+      <span class="prog-sep">→</span>
+      <span class="prog-item pi-done">Kubernetes k3d</span>
+      <span class="prog-sep">→</span>
+      <span class="prog-item pi-done">HPA + Ingress + Prometheus</span>
+      <span class="prog-sep">→</span>
+      <span class="prog-item pi-now">Terraform (IaC)</span>
+      <span class="prog-sep">→</span>
+      <span class="prog-item pi-next">CI/CD completo</span>
+    </div>
+
+    <div class="concept blue">
+      <strong>A analogia certa para a turma.</strong> Eles já sabem que um <code>docker-compose.yml</code> descreve serviços e que um <code>Deployment.yaml</code> descreve pods. O Terraform faz a mesma coisa, mas uma camada acima: descreve o cluster inteiro, as redes, os registries, os namespaces — tudo que existe <em>antes</em> de você fazer o primeiro <code>kubectl apply</code>.
+    </div>
+
+    <div class="concept amber">
+      <strong>Por que não só scripts bash?</strong> Um script cria infraestrutura mas não sabe o que já existe. Se rodar duas vezes, duplica tudo. O Terraform tem <em>estado</em>: sabe o que criou, compara com o que você quer, e só muda o que precisa. É idempotente por design.
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(0,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m0s1">
+    <span class="mod-badge mb-1">Módulo 1 — Conceito IaC</span>
+    <p class="panel-title">O que é Infrastructure as Code</p>
+    <p class="panel-sub">IaC é a prática de gerenciar infraestrutura através de arquivos de configuração declarativos, versionados no git, tratados com o mesmo rigor que código de aplicação.</p>
+    <div class="concept">
+      <strong>Declarativo vs imperativo.</strong> Em vez de dizer "execute esses passos", você diz "esse é o estado desejado". O Terraform descobre sozinho o que fazer para chegar lá — criar, modificar ou destruir recursos.
+    </div>
+    <div class="slabel">Os 4 benefícios principais</div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">conceitos</span></div>
+      <div class="cmd-body"><span class="hl">Reprodutibilidade</span>   → mesmo código = mesmo ambiente, sempre
+<span class="hl">Rastreabilidade</span>    → cada mudança de infra tem um commit no git
+<span class="hl">Colaboração</span>        → infraestrutura revisada em Pull Requests
+<span class="hl">Automação</span>          → CI/CD cria e destrói ambientes sem intervenção humana</div>
+    </div>
+    <div class="concept green">
+      <strong>Conexão com o que já foi visto.</strong> Os manifests YAML do Kubernetes que os alunos escreveram nos roteiros anteriores <em>já são IaC</em> — são declarativos, versionáveis, reprodutíveis. O Terraform estende esse raciocínio para a infraestrutura que hospeda o cluster.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(0,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(0,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m0s2">
+    <span class="mod-badge mb-1">Módulo 1 — Conceito IaC</span>
+    <p class="panel-title">Ferramentas do ecossistema IaC</p>
+    <p class="panel-sub">Terraform não é a única opção — vale contextualizar o ecossistema para os alunos saberem onde cada ferramenta se aplica.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">mapa de ferramentas IaC</span></div>
+      <div class="cmd-body"><span class="hl">Terraform (HashiCorp / OpenTofu)</span>
+  → infraestrutura em cloud (AWS, GCP, Azure) e on-premise
+  → linguagem HCL, multicloud, provider ecosystem enorme
+  → OpenTofu é o fork open-source 100% livre
+
+<span class="hl">Pulumi</span>
+  → mesma ideia do Terraform mas usando Python, TypeScript, Go
+  → bom para equipes que preferem linguagem de programação real
+
+<span class="hl">Ansible</span>
+  → configuração de servidores (instalar pacotes, editar arquivos)
+  → complementa o Terraform: Terraform cria a VM, Ansible configura
+
+<span class="hl">Helm</span>
+  → gerencia aplicações Kubernetes (charts = pacotes de manifests)
+  → Terraform consegue chamar Helm — os dois se combinam bem
+
+<span class="hl">CDK for Terraform (CDKTF)</span>
+  → escreve Terraform usando Python/TypeScript, gera HCL
+  → ponte entre programadores e IaC</div>
+    </div>
+    <div class="concept amber">
+      <strong>Recomendação para o curso.</strong> Começar com Terraform (HCL) porque a maioria das vagas de DevOps/Cloud exige. O OpenTofu é drop-in replacement e 100% open-source — ótimo para laboratório sem licença. Na sequência do currículo, Ansible entra naturalmente junto com servidores físicos ou VMs.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(0,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(0,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m0s3">
+    <span class="mod-badge mb-1">Módulo 1 — Conceito IaC</span>
+    <p class="panel-title">Estrutura básica do HCL</p>
+    <p class="panel-sub">HCL (HashiCorp Configuration Language) é a linguagem do Terraform. É simples e lembra YAML com superpoderes — tem variáveis, funções, loops e módulos.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">anatomia de um arquivo .tf</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># 1. terraform block — configurações do próprio Terraform</span>
+<span class="k">terraform</span> {
+  <span class="k">required_providers</span> {
+    <span class="k">docker</span> = {
+      <span class="k">source</span>  = <span class="s">"kreuzwerker/docker"</span>
+      <span class="k">version</span> = <span class="s">"~> 3.0"</span>
+    }
+  }
+}
+
+<span class="c"># 2. provider block — como conectar ao serviço</span>
+<span class="k">provider</span> <span class="s">"docker"</span> {}
+
+<span class="c"># 3. resource block — o que criar</span>
+<span class="k">resource</span> <span class="s">"docker_container"</span> <span class="s">"nginx"</span> {
+  <span class="k">name</span>  = <span class="s">"meu-nginx"</span>
+  <span class="k">image</span> = <span class="s">"nginx:alpine"</span>
+  <span class="k">ports</span> {
+    <span class="k">internal</span> = <span class="v">80</span>
+    <span class="k">external</span> = <span class="v">8080</span>
+  }
+}
+
+<span class="c"># 4. output block — expõe valores após o apply</span>
+<span class="k">output</span> <span class="s">"container_id"</span> {
+  <span class="k">value</span> = <span class="k">docker_container</span>.nginx.id
+}</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">ciclo de vida — os 4 comandos essenciais</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">terraform init     <span class="c"># baixa os providers declarados</span>
+terraform plan     <span class="c"># mostra o que vai mudar (dry-run)</span>
+terraform apply    <span class="c"># aplica as mudanças</span>
+terraform destroy  <span class="c"># remove tudo que o Terraform criou</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(0,2)">← anterior</button><button class="nav-btn" onclick="goMod(1)" style="background:var(--color-text-primary);color:var(--color-background-primary);padding:8px 18px;border-radius:var(--border-radius-md);font-family:var(--font-sans);font-size:13px;cursor:pointer;border:none;">próximo módulo →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ MODULE 2: TERRAFORM LOCAL -->
+<div class="mod-panel" id="mod1">
+  <div class="steps-nav" id="nav-m1">
+    <button class="step-btn active" onclick="goStep(1,0)"><span class="snum">1</span>Instalação</button>
+    <button class="step-btn" onclick="goStep(1,1)"><span class="snum">2</span>Provider Docker</button>
+    <button class="step-btn" onclick="goStep(1,2)"><span class="snum">3</span>Variáveis</button>
+    <button class="step-btn" onclick="goStep(1,3)"><span class="snum">4</span>State</button>
+  </div>
+
+  <div class="step-panel active" id="m1s0">
+    <span class="mod-badge mb-2">Módulo 2 — Terraform local</span>
+    <p class="panel-title">Instalar Terraform / OpenTofu</p>
+    <p class="panel-sub">Começamos com o provider Docker — sem precisar de conta em cloud. Os alunos já têm Docker instalado, então o feedback é imediato.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">Linux / macOS — Terraform</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># macOS via Homebrew</span>
+brew tap hashicorp/tap
+brew install hashicorp/tap/terraform
+
+<span class="c"># Linux (Ubuntu/Debian)</span>
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform
+
+terraform version</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">alternativa open-source — OpenTofu</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># macOS</span>
+brew install opentofu
+
+<span class="c"># Linux</span>
+curl --proto '=https' --tlsv1.2 -fsSL https://get.opentofu.org/install-opentofu.sh | sh
+
+<span class="c"># OpenTofu é 100% compatível — substitua "terraform" por "tofu"</span>
+tofu version</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">Windows (winget)</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">winget install Hashicorp.Terraform
+<span class="c"># ou OpenTofu</span>
+winget install OpenTofu.OpenTofu</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(1,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m1s1">
+    <span class="mod-badge mb-2">Módulo 2 — Terraform local</span>
+    <p class="panel-title">Primeira infra: container Nginx via Terraform</p>
+    <p class="panel-sub">O provider Docker permite criar containers locais — perfeito para primeira aula porque os alunos veem o container aparecer no <code>docker ps</code> após o apply.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">estrutura de arquivos</span></div>
+      <div class="cmd-body">lab-terraform/
+├── main.tf
+├── variables.tf
+└── outputs.tf</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">main.tf</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">terraform</span> {
+  <span class="k">required_providers</span> {
+    <span class="k">docker</span> = {
+      <span class="k">source</span>  = <span class="s">"kreuzwerker/docker"</span>
+      <span class="k">version</span> = <span class="s">"~> 3.0"</span>
+    }
+  }
+}
+
+<span class="k">provider</span> <span class="s">"docker"</span> {}
+
+<span class="k">resource</span> <span class="s">"docker_image"</span> <span class="s">"nginx"</span> {
+  <span class="k">name</span>         = <span class="s">"nginx:alpine"</span>
+  <span class="k">keep_locally</span> = <span class="v">false</span>
+}
+
+<span class="k">resource</span> <span class="s">"docker_container"</span> <span class="s">"nginx"</span> {
+  <span class="k">image</span> = <span class="k">docker_image</span>.nginx.image_id
+  <span class="k">name</span>  = <span class="k">var</span>.container_name
+
+  <span class="k">ports</span> {
+    <span class="k">internal</span> = <span class="v">80</span>
+    <span class="k">external</span> = <span class="k">var</span>.external_port
+  }
+}</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal — ciclo completo</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">terraform init
+terraform plan    <span class="c"># mostrar o que vai ser criado</span>
+terraform apply   <span class="c"># confirmar com "yes"</span>
+
+docker ps         <span class="c"># container aparece aqui!</span>
+curl localhost:8080
+
+terraform destroy <span class="c"># remove tudo</span>
+docker ps         <span class="c"># container sumiu</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(1,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(1,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m1s2">
+    <span class="mod-badge mb-2">Módulo 2 — Terraform local</span>
+    <p class="panel-title">Variáveis e outputs</p>
+    <p class="panel-sub">Variáveis tornam o código reutilizável. Outputs expõem informações úteis após o apply — como URLs ou IPs gerados pelo provider.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">variables.tf</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">variable</span> <span class="s">"container_name"</span> {
+  <span class="k">type</span>        = <span class="v">string</span>
+  <span class="k">default</span>     = <span class="s">"nginx-tf"</span>
+  <span class="k">description</span> = <span class="s">"Nome do container Docker"</span>
+}
+
+<span class="k">variable</span> <span class="s">"external_port"</span> {
+  <span class="k">type</span>        = <span class="v">number</span>
+  <span class="k">default</span>     = <span class="v">8080</span>
+  <span class="k">description</span> = <span class="s">"Porta exposta no host"</span>
+}</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">outputs.tf</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">output</span> <span class="s">"container_id"</span> {
+  <span class="k">value</span>       = <span class="k">docker_container</span>.nginx.id
+  <span class="k">description</span> = <span class="s">"ID do container criado"</span>
+}
+
+<span class="k">output</span> <span class="s">"url"</span> {
+  <span class="k">value</span>       = <span class="s">"http://localhost:${var.external_port}"</span>
+  <span class="k">description</span> = <span class="s">"URL para acessar o Nginx"</span>
+}</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">override de variáveis</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># via linha de comando</span>
+terraform apply -var="external_port=9090"
+
+<span class="c"># via arquivo .tfvars (commitável, sem segredos)</span>
+<span class="hl">echo 'external_port = 9090' > terraform.tfvars</span>
+terraform apply
+
+<span class="c"># após o apply, ver os outputs</span>
+terraform output</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(1,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(1,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m1s3">
+    <span class="mod-badge mb-2">Módulo 2 — Terraform local</span>
+    <p class="panel-title">Estado (state) e o arquivo terraform.tfstate</p>
+    <p class="panel-sub">O state é o que diferencia Terraform de um script. É um arquivo JSON que registra tudo que foi criado — é ele que permite detectar drift e fazer mudanças incrementais.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">explorar o state</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># listar recursos no state</span>
+terraform state list
+
+<span class="c"># inspecionar um recurso específico</span>
+terraform state show docker_container.nginx
+
+<span class="c"># simular drift: parar o container manualmente</span>
+docker stop $(docker ps -q --filter name=nginx-tf)
+
+<span class="c"># Terraform detecta a diferença</span>
+terraform plan   <span class="c"># mostra que precisa recriar o container</span></div>
+    </div>
+    <div class="concept amber">
+      <strong>Nunca commitar o tfstate com segredos.</strong> O <code>terraform.tfstate</code> pode conter senhas e chaves em texto puro. No lab local está OK, mas em produção o state fica em backends remotos (S3, GCS, Terraform Cloud). Adicionar <code>terraform.tfstate*</code> ao <code>.gitignore</code> é uma regra de segurança básica.
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">.gitignore recomendado para projetos Terraform</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars          <span class="c"># se contiver segredos</span>
+*.tfvars.json</div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">Atividade de fixação</div>
+      <ul>
+        <li>Criar um container Redis via Terraform (sem compose)</li>
+        <li>Modificar a porta exposta sem destruir — só alterar a variável e fazer <code>apply</code></li>
+        <li>Explicar o que o <code>terraform plan</code> mostrou antes e depois da mudança</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(1,2)">← anterior</button><button class="nav-btn" onclick="goMod(2)" style="background:var(--color-text-primary);color:var(--color-background-primary);padding:8px 18px;border-radius:var(--border-radius-md);font-family:var(--font-sans);font-size:13px;cursor:pointer;border:none;">próximo módulo →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ MODULE 3: CLUSTER k3d VIA TERRAFORM -->
+<div class="mod-panel" id="mod2">
+  <div class="steps-nav" id="nav-m2">
+    <button class="step-btn active" onclick="goStep(2,0)"><span class="snum">1</span>Provider k3d</button>
+    <button class="step-btn" onclick="goStep(2,1)"><span class="snum">2</span>Cluster como código</button>
+    <button class="step-btn" onclick="goStep(2,2)"><span class="snum">3</span>Módulos</button>
+    <button class="step-btn" onclick="goStep(2,3)"><span class="snum">4</span>Ambientes</button>
+  </div>
+
+  <div class="step-panel active" id="m2s0">
+    <span class="mod-badge mb-3">Módulo 3 — Cluster via Terraform</span>
+    <p class="panel-title">Provider k3d para Terraform</p>
+    <p class="panel-sub">Existe um provider Terraform para o k3d — permite criar o mesmo cluster do roteiro anterior com um arquivo <code>.tf</code> em vez de um comando manual no terminal.</p>
+    <div class="concept blue">
+      <strong>A conexão com o roteiro anterior.</strong> No roteiro k8s os alunos rodaram <code>k3d cluster create voteapp --servers 1 --agents 2 ...</code>. Agora esse mesmo cluster vai ser descrito em HCL e criado com <code>terraform apply</code>. Mesma infraestrutura, processo automatizável e versionável.
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">main.tf — provider k3d</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">terraform</span> {
+  <span class="k">required_providers</span> {
+    <span class="k">k3d</span> = {
+      <span class="k">source</span>  = <span class="s">"pvotal-tech/k3d"</span>
+      <span class="k">version</span> = <span class="s">"~> 0.0.5"</span>
+    }
+  }
+}
+
+<span class="k">provider</span> <span class="s">"k3d"</span> {}
+
+<span class="k">resource</span> <span class="s">"k3d_cluster"</span> <span class="s">"voteapp"</span> {
+  <span class="k">name</span>    = <span class="s">"voteapp"</span>
+  <span class="k">servers</span> = <span class="v">1</span>
+  <span class="k">agents</span>  = <span class="v">2</span>
+
+  <span class="k">port</span> {
+    <span class="k">host_port</span>      = <span class="v">80</span>
+    <span class="k">container_port</span> = <span class="v">80</span>
+    <span class="k">node_filters</span>   = [<span class="s">"loadbalancer"</span>]
+  }
+
+  <span class="k">port</span> {
+    <span class="k">host_port</span>      = <span class="v">443</span>
+    <span class="k">container_port</span> = <span class="v">443</span>
+    <span class="k">node_filters</span>   = [<span class="s">"loadbalancer"</span>]
+  }
+
+  <span class="k">k3s</span> {
+    <span class="k">extra_args</span> {
+      <span class="k">arg</span>          = <span class="s">"--disable=traefik"</span>
+      <span class="k">node_filters</span> = [<span class="s">"server:0"</span>]
+    }
+  }
+}</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">terminal</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">terraform init
+terraform apply   <span class="c"># cria o cluster k3d</span>
+kubectl get nodes  <span class="c"># cluster já configurado no kubeconfig</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(2,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m2s1">
+    <span class="mod-badge mb-3">Módulo 3 — Cluster via Terraform</span>
+    <p class="panel-title">Cluster completo como código</p>
+    <p class="panel-sub">Combinamos o provider k3d com o provider Kubernetes para criar o cluster e já instalar o namespace do voteapp em um único <code>terraform apply</code>.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">main.tf completo — cluster + namespace</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">terraform</span> {
+  <span class="k">required_providers</span> {
+    <span class="k">k3d</span> = {
+      <span class="k">source</span>  = <span class="s">"pvotal-tech/k3d"</span>
+      <span class="k">version</span> = <span class="s">"~> 0.0.5"</span>
+    }
+    <span class="k">kubernetes</span> = {
+      <span class="k">source</span>  = <span class="s">"hashicorp/kubernetes"</span>
+      <span class="k">version</span> = <span class="s">"~> 2.0"</span>
+    }
+  }
+}
+
+<span class="k">resource</span> <span class="s">"k3d_cluster"</span> <span class="s">"voteapp"</span> {
+  <span class="k">name</span>    = <span class="s">"voteapp"</span>
+  <span class="k">servers</span> = <span class="v">1</span>
+  <span class="k">agents</span>  = <span class="v">2</span>
+  <span class="k">port</span> {
+    <span class="k">host_port</span>      = <span class="v">80</span>
+    <span class="k">container_port</span> = <span class="v">80</span>
+    <span class="k">node_filters</span>   = [<span class="s">"loadbalancer"</span>]
+  }
+}
+
+<span class="c"># provider Kubernetes lê o kubeconfig gerado pelo k3d</span>
+<span class="k">provider</span> <span class="s">"kubernetes"</span> {
+  <span class="k">config_path</span>    = <span class="s">"~/.kube/config"</span>
+  <span class="k">config_context</span> = <span class="s">"k3d-voteapp"</span>
+  <span class="k">depends_on</span>     = [<span class="k">k3d_cluster</span>.voteapp]
+}
+
+<span class="k">resource</span> <span class="s">"kubernetes_namespace"</span> <span class="s">"voteapp"</span> {
+  <span class="k">metadata</span> {
+    <span class="k">name</span> = <span class="s">"voteapp"</span>
+    <span class="k">labels</span> = {
+      <span class="k">app</span> = <span class="s">"vote-application"</span>
+    }
+  }
+  <span class="k">depends_on</span> = [<span class="k">k3d_cluster</span>.voteapp]
+}</div>
+    </div>
+    <div class="concept green">
+      <strong>depends_on é o depends_on do compose... mas melhor.</strong> O Terraform infere dependências automaticamente quando um recurso referencia outro (ex: <code>k3d_cluster.voteapp.id</code>). O <code>depends_on</code> explícito é só para casos onde a dependência não é óbvia no código.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(2,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(2,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m2s2">
+    <span class="mod-badge mb-3">Módulo 3 — Cluster via Terraform</span>
+    <p class="panel-title">Módulos Terraform</p>
+    <p class="panel-sub">Módulos são blocos reutilizáveis de código Terraform — como funções ou classes para infraestrutura. Permitem encapsular a criação do cluster e reusar em vários projetos.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">estrutura com módulo</span></div>
+      <div class="cmd-body">infra/
+├── main.tf              <span class="c"># chama os módulos</span>
+├── variables.tf
+├── outputs.tf
+└── modules/
+    └── k3d-cluster/
+        ├── main.tf      <span class="c"># define o recurso k3d_cluster</span>
+        ├── variables.tf <span class="c"># parâmetros: nome, agents, portas</span>
+        └── outputs.tf   <span class="c"># expõe: kubeconfig, cluster_name</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">main.tf — chamando o módulo</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">module</span> <span class="s">"cluster"</span> {
+  <span class="k">source</span>  = <span class="s">"./modules/k3d-cluster"</span>
+
+  <span class="k">cluster_name</span>  = <span class="s">"voteapp"</span>
+  <span class="k">agent_count</span>   = <span class="v">2</span>
+  <span class="k">http_port</span>     = <span class="v">80</span>
+}
+
+<span class="c"># usar outputs do módulo em outros recursos</span>
+<span class="k">resource</span> <span class="s">"kubernetes_namespace"</span> <span class="s">"voteapp"</span> {
+  <span class="k">metadata</span> { <span class="k">name</span> = <span class="s">"voteapp"</span> }
+  <span class="k">depends_on</span> = [<span class="k">module</span>.cluster]
+}</div>
+    </div>
+    <div class="concept">
+      <strong>Módulos públicos no Terraform Registry.</strong> Assim como o Docker Hub tem imagens prontas, o registry.terraform.io tem módulos prontos para AWS EKS, GKE, AKS, etc. Em produção raramente se escreve o cluster do zero — usa-se um módulo da comunidade e se parametriza.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(2,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(2,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m2s3">
+    <span class="mod-badge mb-3">Módulo 3 — Cluster via Terraform</span>
+    <p class="panel-title">Múltiplos ambientes (dev / staging / prod)</p>
+    <p class="panel-sub">Com Terraform é trivial manter ambientes separados — o mesmo código cria clusters com configurações diferentes usando workspaces ou diretórios por ambiente.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">estratégia 1 — workspaces</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="c"># criar e mudar de workspace</span>
+terraform workspace new dev
+terraform workspace new staging
+
+<span class="c"># no código, usar o workspace como variável</span>
+<span class="k">locals</span> {
+  <span class="k">cluster_name</span> = <span class="s">"voteapp-${terraform.workspace}"</span>
+  <span class="k">agent_count</span>  = <span class="k">terraform.workspace</span> == <span class="s">"prod"</span> ? <span class="v">3</span> : <span class="v">1</span>
+}
+
+<span class="c"># dev: terraform workspace select dev && terraform apply</span>
+<span class="c"># cria cluster "voteapp-dev" com 1 agent</span>
+
+<span class="c"># prod: terraform workspace select prod && terraform apply</span>
+<span class="c"># cria cluster "voteapp-prod" com 3 agents</span></div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">estratégia 2 — diretórios por ambiente (mais explícita)</span></div>
+      <div class="cmd-body">infra/
+├── modules/k3d-cluster/
+├── environments/
+│   ├── dev/
+│   │   ├── main.tf      <span class="c"># chama módulo com config dev</span>
+│   │   └── terraform.tfvars
+│   └── prod/
+│       ├── main.tf      <span class="c"># chama módulo com config prod</span>
+│       └── terraform.tfvars</div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">Pergunta para discussão em aula</div>
+      <ul>
+        <li>Em qual cenário workspaces são mais simples? E diretórios por ambiente?</li>
+        <li>O que acontece com o state quando você tem dois workspaces?</li>
+        <li>Como você garantiria que ninguém faça <code>terraform destroy</code> em prod por acidente?</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(2,2)">← anterior</button><button class="nav-btn" onclick="goMod(3)" style="background:var(--color-text-primary);color:var(--color-background-primary);padding:8px 18px;border-radius:var(--border-radius-md);font-family:var(--font-sans);font-size:13px;cursor:pointer;border:none;">próximo módulo →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ MODULE 4: MANIFESTS K8S VIA TERRAFORM -->
+<div class="mod-panel" id="mod3">
+  <div class="steps-nav" id="nav-m3">
+    <button class="step-btn active" onclick="goStep(3,0)"><span class="snum">1</span>Provider k8s</button>
+    <button class="step-btn" onclick="goStep(3,1)"><span class="snum">2</span>VoteApp via TF</button>
+    <button class="step-btn" onclick="goStep(3,2)"><span class="snum">3</span>Helm provider</button>
+    <button class="step-btn" onclick="goStep(3,3)"><span class="snum">4</span>Stack completa</button>
+  </div>
+
+  <div class="step-panel active" id="m3s0">
+    <span class="mod-badge mb-4">Módulo 4 — Manifests k8s via Terraform</span>
+    <p class="panel-title">Gerenciar recursos Kubernetes com Terraform</p>
+    <p class="panel-sub">O provider Kubernetes permite criar Deployments, Services, Secrets e HPAs diretamente via HCL — em vez de arquivos YAML separados. Tudo fica no mesmo grafo de dependências do Terraform.</p>
+    <div class="concept coral">
+      <strong>Terraform vs kubectl apply — quando usar cada um.</strong> Terraform gerencia a infraestrutura que <em>raramente muda</em> (cluster, namespaces, secrets, Ingress Controller). <code>kubectl apply</code> / Helm gerencia aplicações que <em>mudam a cada deploy</em>. Na prática, empresas usam Terraform para infra e GitOps (ArgoCD/Flux) para apps — mas para o lab, usar Terraform para os dois é didaticamente rico.
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">provider kubernetes no main.tf</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">provider</span> <span class="s">"kubernetes"</span> {
+  <span class="k">config_path</span>    = <span class="s">"~/.kube/config"</span>
+  <span class="k">config_context</span> = <span class="s">"k3d-voteapp"</span>
+}</div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(3,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m3s1">
+    <span class="mod-badge mb-4">Módulo 4 — Manifests k8s via Terraform</span>
+    <p class="panel-title">Deploy do Redis via Terraform</p>
+    <p class="panel-sub">Equivalente ao <code>redis-deployment.yaml</code> do roteiro anterior, mas em HCL — com a vantagem de que variáveis, outputs e dependências são gerenciadas junto com o restante da infra.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">redis.tf</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">resource</span> <span class="s">"kubernetes_deployment"</span> <span class="s">"redis"</span> {
+  <span class="k">metadata</span> {
+    <span class="k">name</span>      = <span class="s">"redis"</span>
+    <span class="k">namespace</span> = <span class="k">kubernetes_namespace</span>.voteapp.metadata[<span class="v">0</span>].name
+  }
+  <span class="k">spec</span> {
+    <span class="k">replicas</span> = <span class="v">1</span>
+    <span class="k">selector</span> { <span class="k">match_labels</span> = { <span class="k">app</span> = <span class="s">"redis"</span> } }
+    <span class="k">template</span> {
+      <span class="k">metadata</span> { <span class="k">labels</span> = { <span class="k">app</span> = <span class="s">"redis"</span> } }
+      <span class="k">spec</span> {
+        <span class="k">container</span> {
+          <span class="k">name</span>  = <span class="s">"redis"</span>
+          <span class="k">image</span> = <span class="s">"redis:alpine"</span>
+          <span class="k">port</span> { <span class="k">container_port</span> = <span class="v">6379</span> }
+        }
+      }
+    }
+  }
+}
+
+<span class="k">resource</span> <span class="s">"kubernetes_service"</span> <span class="s">"redis"</span> {
+  <span class="k">metadata</span> {
+    <span class="k">name</span>      = <span class="s">"redis"</span>
+    <span class="k">namespace</span> = <span class="k">kubernetes_namespace</span>.voteapp.metadata[<span class="v">0</span>].name
+  }
+  <span class="k">spec</span> {
+    <span class="k">selector</span> = { <span class="k">app</span> = <span class="s">"redis"</span> }
+    <span class="k">port</span> {
+      <span class="k">port</span>        = <span class="v">6379</span>
+      <span class="k">target_port</span> = <span class="v">6379</span>
+    }
+  }
+}</div>
+    </div>
+    <div class="concept amber">
+      <strong>Observação pedagógica.</strong> Os alunos vão perceber que o HCL é mais verboso que o YAML para recursos k8s. Isso é normal — e é a abertura para discutir quando usar <code>kubectl apply</code> direto vs Terraform. A resposta certa depende do contexto.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(3,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(3,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m3s2">
+    <span class="mod-badge mb-4">Módulo 4 — Manifests k8s via Terraform</span>
+    <p class="panel-title">Helm provider — instalar Prometheus via Terraform</p>
+    <p class="panel-sub">O provider Helm permite instalar charts Kubernetes diretamente do Terraform — conecta o que foi feito no módulo de monitoramento com IaC.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">helm.tf — kube-prometheus-stack via Terraform</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">provider</span> <span class="s">"helm"</span> {
+  <span class="k">kubernetes</span> {
+    <span class="k">config_path</span>    = <span class="s">"~/.kube/config"</span>
+    <span class="k">config_context</span> = <span class="s">"k3d-voteapp"</span>
+  }
+}
+
+<span class="k">resource</span> <span class="s">"kubernetes_namespace"</span> <span class="s">"monitoring"</span> {
+  <span class="k">metadata</span> { <span class="k">name</span> = <span class="s">"monitoring"</span> }
+  <span class="k">depends_on</span> = [<span class="k">k3d_cluster</span>.voteapp]
+}
+
+<span class="k">resource</span> <span class="s">"helm_release"</span> <span class="s">"prometheus"</span> {
+  <span class="k">name</span>       = <span class="s">"kube-prometheus-stack"</span>
+  <span class="k">repository</span> = <span class="s">"https://prometheus-community.github.io/helm-charts"</span>
+  <span class="k">chart</span>      = <span class="s">"kube-prometheus-stack"</span>
+  <span class="k">namespace</span>  = <span class="k">kubernetes_namespace</span>.monitoring.metadata[<span class="v">0</span>].name
+  <span class="k">version</span>    = <span class="s">"55.0.0"</span>
+
+  <span class="k">set</span> {
+    <span class="k">name</span>  = <span class="s">"grafana.adminPassword"</span>
+    <span class="k">value</span> = <span class="k">var</span>.grafana_password
+  }
+  <span class="k">set</span> {
+    <span class="k">name</span>  = <span class="s">"alertmanager.enabled"</span>
+    <span class="k">value</span> = <span class="s">"false"</span>
+  }
+
+  <span class="k">depends_on</span> = [<span class="k">kubernetes_namespace</span>.monitoring]
+}</div>
+    </div>
+    <div class="concept green">
+      <strong>Um apply para tudo.</strong> Com esse setup, um único <code>terraform apply</code> cria o cluster k3d, o namespace voteapp, o namespace monitoring, e instala o Prometheus/Grafana. O que levou ~15 minutos seguindo o roteiro manual agora leva 2 minutos e é reprodutível.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(3,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(3,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m3s3">
+    <span class="mod-badge mb-4">Módulo 4 — Manifests k8s via Terraform</span>
+    <p class="panel-title">Stack completa — estrutura final do projeto</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">estrutura de arquivos final</span></div>
+      <div class="cmd-body">voteapplication/
+├── app/                     <span class="c"># código da aplicação</span>
+│   ├── vote/
+│   └── result/
+├── k8s/                     <span class="c"># manifests kubectl (deploy manual / GitOps)</span>
+│   ├── vote-deployment.yaml
+│   └── ...
+└── infra/                   <span class="c"># Terraform — infraestrutura</span>
+    ├── main.tf              <span class="c"># cluster k3d</span>
+    ├── namespaces.tf        <span class="c"># namespaces</span>
+    ├── redis.tf             <span class="c"># redis deployment + service</span>
+    ├── postgres.tf          <span class="c"># postgres + pvc + secret</span>
+    ├── helm.tf              <span class="c"># prometheus + grafana via Helm</span>
+    ├── variables.tf
+    ├── outputs.tf
+    └── terraform.tfvars</div>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">deploy completo — do zero ao voteapp monitorado</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body">cd infra/
+terraform init
+terraform plan    <span class="c"># revisar o que será criado</span>
+terraform apply   <span class="c"># criar tudo</span>
+
+<span class="c"># verificar</span>
+kubectl get nodes
+kubectl get pods -n voteapp
+kubectl get pods -n monitoring
+
+<span class="c"># acessar</span>
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80 &
+<span class="c"># http://localhost:3000 → admin / (ver var.grafana_password)</span>
+
+<span class="c"># destruir tudo em 1 comando</span>
+terraform destroy</div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">Entregável da atividade</div>
+      <ul>
+        <li>Repositório git com o diretório <code>infra/</code> commitado</li>
+        <li><code>terraform plan</code> sem erros após clone em outra máquina</li>
+        <li>Print do Grafana funcionando após <code>terraform apply</code> do zero</li>
+        <li><code>README.md</code> com instruções de uso (pré-requisitos, variáveis, comandos)</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(3,2)">← anterior</button><button class="nav-btn" onclick="goMod(4)" style="background:var(--color-text-primary);color:var(--color-background-primary);padding:8px 18px;border-radius:var(--border-radius-md);font-family:var(--font-sans);font-size:13px;cursor:pointer;border:none;">próximo módulo →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ MODULE 5: CI/CD COMPLETO -->
+<div class="mod-panel" id="mod4">
+  <div class="steps-nav" id="nav-m4">
+    <button class="step-btn active" onclick="goStep(4,0)"><span class="snum">1</span>Ciclo completo</button>
+    <button class="step-btn" onclick="goStep(4,1)"><span class="snum">2</span>Pipeline infra</button>
+    <button class="step-btn" onclick="goStep(4,2)"><span class="snum">3</span>Pipeline app</button>
+    <button class="step-btn" onclick="goStep(4,3)"><span class="snum">4</span>Próximos passos</button>
+  </div>
+
+  <div class="step-panel active" id="m4s0">
+    <span class="mod-badge mb-5">Módulo 5 — CI/CD completo</span>
+    <p class="panel-title">O ciclo completo: code → infra → deploy → monitor</p>
+    <p class="panel-sub">Com Terraform no repositório, é possível automatizar não só o deploy da aplicação mas também a criação da infraestrutura — fechando o ciclo DevOps completo que a disciplina se propõe a mostrar.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">visão geral do fluxo</span></div>
+      <div class="cmd-body"><span class="hl">DEV</span>  →  git push  →  GitHub Actions
+
+<span class="hl">PIPELINE DE INFRA</span> (quando infra/ muda)
+  1. terraform fmt --check   <span class="c"># verifica formatação</span>
+  2. terraform validate      <span class="c"># valida sintaxe HCL</span>
+  3. terraform plan          <span class="c"># gera plan como artefato</span>
+  4. PR review               <span class="c"># humano aprova o plan</span>
+  5. terraform apply         <span class="c"># merge na main → apply automático</span>
+
+<span class="hl">PIPELINE DE APP</span> (quando app/ ou k8s/ muda)
+  1. docker build + push     <span class="c"># nova imagem → registry</span>
+  2. kubectl set image       <span class="c"># rolling update no cluster</span>
+  3. kubectl rollout status  <span class="c"># aguarda deploy completo</span>
+  4. smoke test              <span class="c"># curl no endpoint</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" disabled>← anterior</button><button class="nav-btn primary" onclick="goStep(4,1)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m4s1">
+    <span class="mod-badge mb-5">Módulo 5 — CI/CD completo</span>
+    <p class="panel-title">Pipeline de infraestrutura com GitHub Actions</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">.github/workflows/terraform.yml</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">name:</span> <span class="v">Terraform</span>
+
+<span class="k">on:</span>
+  <span class="k">push:</span>
+    <span class="k">branches:</span> [<span class="v">main</span>]
+    <span class="k">paths:</span> [<span class="s">'infra/**'</span>]
+  <span class="k">pull_request:</span>
+    <span class="k">paths:</span> [<span class="s">'infra/**'</span>]
+
+<span class="k">jobs:</span>
+  <span class="k">terraform:</span>
+    <span class="k">runs-on:</span> <span class="v">ubuntu-latest</span>
+    <span class="k">defaults:</span>
+      <span class="k">run:</span>
+        <span class="k">working-directory:</span> <span class="v">infra/</span>
+
+    <span class="k">steps:</span>
+    - <span class="k">uses:</span> <span class="v">actions/checkout@v4</span>
+
+    - <span class="k">name:</span> <span class="v">Setup Terraform</span>
+      <span class="k">uses:</span> <span class="v">hashicorp/setup-terraform@v3</span>
+
+    - <span class="k">name:</span> <span class="v">Terraform fmt</span>
+      <span class="k">run:</span> <span class="v">terraform fmt -check</span>
+
+    - <span class="k">name:</span> <span class="v">Terraform init</span>
+      <span class="k">run:</span> <span class="v">terraform init</span>
+
+    - <span class="k">name:</span> <span class="v">Terraform validate</span>
+      <span class="k">run:</span> <span class="v">terraform validate</span>
+
+    - <span class="k">name:</span> <span class="v">Terraform plan</span>
+      <span class="k">run:</span> <span class="v">terraform plan -no-color</span>
+      <span class="k">if:</span> <span class="v">github.event_name == 'pull_request'</span>
+
+    - <span class="k">name:</span> <span class="v">Terraform apply</span>
+      <span class="k">run:</span> <span class="v">terraform apply -auto-approve</span>
+      <span class="k">if:</span> <span class="v">github.ref == 'refs/heads/main' && github.event_name == 'push'</span></div>
+    </div>
+    <div class="concept amber">
+      <strong>State remoto para CI/CD.</strong> Em pipelines, o state não pode ficar local. Usar Terraform Cloud (gratuito para projetos pequenos) ou um bucket S3/GCS como backend. O runner do GitHub Actions não tem estado entre execuções.
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(4,0)">← anterior</button><button class="nav-btn primary" onclick="goStep(4,2)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m4s2">
+    <span class="mod-badge mb-5">Módulo 5 — CI/CD completo</span>
+    <p class="panel-title">Pipeline de aplicação — build + deploy + smoke test</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">.github/workflows/deploy.yml</span><button class="copy-btn" onclick="cp(this)">copiar</button></div>
+      <div class="cmd-body"><span class="k">name:</span> <span class="v">Deploy VoteApp</span>
+
+<span class="k">on:</span>
+  <span class="k">push:</span>
+    <span class="k">branches:</span> [<span class="v">main</span>]
+    <span class="k">paths:</span> [<span class="s">'vote/**'</span>, <span class="s">'result/**'</span>]
+
+<span class="k">jobs:</span>
+  <span class="k">build-and-deploy:</span>
+    <span class="k">runs-on:</span> <span class="v">ubuntu-latest</span>
+    <span class="k">steps:</span>
+    - <span class="k">uses:</span> <span class="v">actions/checkout@v4</span>
+
+    - <span class="k">name:</span> <span class="v">Build e push imagem vote</span>
+      <span class="k">run:</span> <span class="v">|</span>
+        <span class="v">docker build -t ghcr.io/${{ github.repository }}/vote:${{ github.sha }} vote/</span>
+        <span class="v">docker push ghcr.io/${{ github.repository }}/vote:${{ github.sha }}</span>
+
+    - <span class="k">name:</span> <span class="v">Configurar kubectl</span>
+      <span class="k">uses:</span> <span class="v">azure/k8s-set-context@v3</span>
+      <span class="k">with:</span>
+        <span class="k">kubeconfig:</span> <span class="v">${{ secrets.KUBECONFIG }}</span>
+
+    - <span class="k">name:</span> <span class="v">Rolling update</span>
+      <span class="k">run:</span> <span class="v">|</span>
+        <span class="v">kubectl set image deployment/vote \</span>
+          <span class="v">vote=ghcr.io/${{ github.repository }}/vote:${{ github.sha }} \</span>
+          <span class="v">-n voteapp</span>
+        <span class="v">kubectl rollout status deployment/vote -n voteapp --timeout=120s</span>
+
+    - <span class="k">name:</span> <span class="v">Smoke test</span>
+      <span class="k">run:</span> <span class="v">|</span>
+        <span class="v">STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://vote.local)</span>
+        <span class="v">[ "$STATUS" = "200" ] && echo "OK" || exit 1</span></div>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(4,1)">← anterior</button><button class="nav-btn primary" onclick="goStep(4,3)">próximo →</button></div>
+  </div>
+
+  <div class="step-panel" id="m4s3">
+    <span class="mod-badge mb-5">Módulo 5 — CI/CD completo</span>
+    <p class="panel-title">Próximos passos além do laboratório</p>
+    <p class="panel-sub">O lab com k3d + Terraform é uma excelente base. Aqui está o mapa do que vem a seguir quando os alunos avançarem para cloud ou projetos reais.</p>
+    <div class="cmd-block">
+      <div class="cmd-header"><span class="cmd-label">progressão sugerida</span></div>
+      <div class="cmd-body"><span class="hl">1. Cloud real (AWS/GCP/Azure)</span>
+   → Terraform cria EKS / GKE / AKS em vez de k3d
+   → Mesmos manifests k8s funcionam sem mudança
+   → AWS Academy já tem créditos para isso
+
+<span class="hl">2. State remoto</span>
+   → backend S3 + DynamoDB para lock (AWS)
+   → ou Terraform Cloud (gratuito para estudo)
+
+<span class="hl">3. GitOps com ArgoCD ou Flux</span>
+   → Terraform cria o cluster e instala o ArgoCD
+   → ArgoCD monitora o repositório e faz deploy automático
+   → separação clara: Terraform = infra, ArgoCD = apps
+
+<span class="hl">4. Secrets management</span>
+   → HashiCorp Vault ou AWS Secrets Manager
+   → nunca senha em variável de ambiente ou tfvars no git
+
+<span class="hl">5. Policy as Code</span>
+   → OPA / Sentinel: regras que bloqueiam configs inseguras
+   → ex: "nenhum Deployment sem readinessProbe" como política</div>
+    </div>
+    <div class="verify">
+      <div class="verify-title">Checklist final da sequência completa da disciplina</div>
+      <ul>
+        <li>Container Docker rodando com Dockerfile customizado ✓</li>
+        <li>Stack multi-serviço com docker-compose ✓</li>
+        <li>Cluster Kubernetes local com k3d ✓</li>
+        <li>HPA, Ingress, Prometheus, Grafana, Rollout ✓</li>
+        <li>Infraestrutura como código com Terraform ✓</li>
+        <li>Pipeline CI/CD automatizando infra e deploy ✓</li>
+      </ul>
+    </div>
+    <div class="nav-row"><button class="nav-btn" onclick="goStep(4,2)">← anterior</button><button class="nav-btn" disabled>fim do roteiro</button></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function goMod(m) {
+  document.querySelectorAll('.mod-panel').forEach((p,i) => p.classList.toggle('active', i===m));
+  document.querySelectorAll('.mod-btn').forEach((b,i) => b.classList.toggle('active', i===m));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goStep(mod, step) {
+  const panels = document.querySelectorAll('#mod' + mod + ' .step-panel');
+  const btns = document.querySelectorAll('#nav-m' + mod + ' .step-btn');
+  panels.forEach((p,i) => p.classList.toggle('active', i===step));
+  btns.forEach((b,i) => { b.classList.remove('active','done'); if(i===step) b.classList.add('active'); else if(i<step) b.classList.add('done'); });
+}
+function cp(btn) {
+  const body = btn.closest('.cmd-block').querySelector('.cmd-body');
+  navigator.clipboard.writeText(body.innerText).then(() => {
+    btn.textContent = 'copiado!';
+    setTimeout(() => btn.textContent = 'copiar', 1500);
+  });
+}
+</script>
