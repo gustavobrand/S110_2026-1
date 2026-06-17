@@ -1,4 +1,3 @@
-# ── Cluster ────────────────────────────────────────────────
 variable "cluster_name" {
   type        = string
   default     = "voteapp"
@@ -8,7 +7,7 @@ variable "cluster_name" {
 variable "agent_count" {
   type        = number
   default     = 2
-  description = "Número de nós agents no cluster"
+  description = "Numero de nodes atuando como agentes no cluster"
 }
 
 variable "k3s_image" {
@@ -30,7 +29,6 @@ variable "kubeconfig_context" {
   description = "Contexto do kubeconfig (ex.: k3d-voteapp). Se null, usa k3d-<cluster_name>"
 }
 
-# ── Postgres ────────────────────────────────────────────────
 variable "postgres_db" {
   type        = string
   default     = "db"
@@ -62,23 +60,22 @@ variable "postgres_storage_class" {
   description = "StorageClass usada pelo PVC do Postgres (null = classe padrao do cluster)"
 }
 
-# ── Aplicação ───────────────────────────────────────────────
 variable "vote_replicas" {
   type        = number
   default     = 2
-  description = "Número de réplicas do serviço vote"
+  description = "Numero de replicas do servico vote"
 }
 
 variable "vote_image" {
   type        = string
   default     = "dockersamples/examplevotingapp_vote"
-  description = "Imagem Docker do serviço vote"
+  description = "Imagem Docker do servico vote"
 }
 
 variable "result_image" {
   type        = string
   default     = "dockersamples/examplevotingapp_result"
-  description = "Imagem Docker do serviço result"
+  description = "Imagem Docker do servico result"
 }
 
 variable "worker_image" {
@@ -87,16 +84,15 @@ variable "worker_image" {
   description = "Imagem Docker do worker"
 }
 
-# ── Monitoramento ───────────────────────────────────────────
 variable "grafana_password" {
   type        = string
   default     = "admin123"
-  description = "Senha do Grafana (não commitar em produção)"
+  description = "Senha do Grafana (nao commitar em producao)"
   sensitive   = true
 }
 
 variable "prometheus_chart_version" {
   type        = string
   default     = "55.0.0"
-  description = "Versão do chart kube-prometheus-stack"
+  description = "Versao do chart kube-prometheus-stack"
 }
