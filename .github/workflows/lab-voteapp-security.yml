@@ -1,0 +1,46 @@
+name: Lab VoteApp Security
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lab-voteapp-terraform/**'
+      - '.github/workflows/lab-voteapp-security.yml'
+  pull_request:
+    paths:
+      - 'lab-voteapp-terraform/**'
+      - '.github/workflows/lab-voteapp-security.yml'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect secrets in lab-voteapp-terraform
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest \
+            dir /repo/lab-voteapp-terraform --redact --exit-code 1
+
+  trivy-fs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Trivy filesystem scan (SARIF)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          scan-ref: lab-voteapp-terraform
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif

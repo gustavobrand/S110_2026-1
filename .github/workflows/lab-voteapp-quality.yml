@@ -1,0 +1,105 @@
+name: Lab VoteApp Quality
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lab-voteapp-terraform/app/**'
+      - '.github/workflows/lab-voteapp-quality.yml'
+  pull_request:
+    paths:
+      - 'lab-voteapp-terraform/app/**'
+      - '.github/workflows/lab-voteapp-quality.yml'
+
+jobs:
+  dockerfiles-hadolint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint Dockerfiles
+        run: |
+          set -euo pipefail
+          for file in \
+            lab-voteapp-terraform/app/vote/Dockerfile \
+            lab-voteapp-terraform/app/result/Dockerfile \
+            lab-voteapp-terraform/app/result/tests/Dockerfile \
+            lab-voteapp-terraform/app/worker/Dockerfile \
+            lab-voteapp-terraform/app/worker/Dockerfile.j
+          do
+            echo "Linting ${file}"
+            docker run --rm -i hadolint/hadolint < "${file}"
+          done
+
+  compose-validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lab-voteapp-terraform/app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate docker-compose.yml
+        run: docker compose -f docker-compose.yml config >/dev/null
+
+      - name: Validate docker-compose-simple.yml
+        run: docker compose -f docker-compose-simple.yml config >/dev/null
+
+      - name: Validate docker-compose-javaworker.yml
+        run: docker compose -f docker-compose-javaworker.yml config >/dev/null
+
+  python-vote-static:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lab-voteapp-terraform/app/vote
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Python syntax check
+        run: python -m py_compile app.py
+
+  node-result-static:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lab-voteapp-terraform/app/result
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Node syntax check
+        run: node --check server.js
+
+  java-worker-build-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lab-voteapp-terraform/app/worker
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+          cache: maven
+
+      - name: Maven package (no tests)
+        run: mvn -B -DskipTests package

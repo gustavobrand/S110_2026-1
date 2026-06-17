@@ -1,0 +1,70 @@
+name: VoteApp CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lab-voteapp-terraform/app/**'
+      - '.github/workflows/app-ci.yml'
+  pull_request:
+    paths:
+      - 'lab-voteapp-terraform/app/**'
+      - '.github/workflows/app-ci.yml'
+
+jobs:
+  app-compose-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lab-voteapp-terraform/app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start application stack
+        run: docker compose -f docker-compose-javaworker.yml up -d --build
+
+      - name: Wait for vote and result endpoints
+        run: |
+          set -euo pipefail
+          for i in {1..60}; do
+            if curl -fsS http://localhost:5000/ >/dev/null && curl -fsS http://localhost:5001/ >/dev/null; then
+              echo "Vote and Result are reachable"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Timeout waiting for app endpoints"
+          docker compose -f docker-compose-javaworker.yml ps
+          exit 1
+
+      - name: Smoke test vote page
+        run: |
+          set -euo pipefail
+          curl -fsS http://localhost:5000/ | grep -Eiq 'Python|Javascript'
+
+      - name: Submit vote and verify persistence in Postgres
+        run: |
+          set -euo pipefail
+          curl -fsS -X POST --data 'vote=b' http://localhost:5000/ >/dev/null
+
+          for i in {1..30}; do
+            VOTES=$(docker compose -f docker-compose-javaworker.yml exec -T db psql -U postgres -d postgres -tAc "SELECT COUNT(*) FROM votes WHERE vote='b';" | tr -d '[:space:]')
+            if [[ "${VOTES}" =~ ^[0-9]+$ ]] && [[ "${VOTES}" -ge 1 ]]; then
+              echo "Vote processed by worker and stored in DB (${VOTES})"
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Vote was not persisted in DB in time"
+          docker compose -f docker-compose-javaworker.yml logs worker db
+          exit 1
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose -f docker-compose-javaworker.yml logs --no-color
+
+      - name: Teardown stack
+        if: always()
+        run: docker compose -f docker-compose-javaworker.yml down -v
