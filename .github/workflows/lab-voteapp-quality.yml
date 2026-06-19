@@ -28,7 +28,7 @@ jobs:
             lab-voteapp-terraform/app/worker/Dockerfile.j
           do
             echo "Linting ${file}"
-            docker run --rm -i hadolint/hadolint < "${file}"
+            docker run --rm -i hadolint/hadolint hadolint --failure-threshold error - < "${file}"
           done
 
   compose-validate:
