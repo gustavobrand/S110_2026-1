@@ -11,10 +11,10 @@ RUN apt-get update && apt-get install -y ca-certificates wget && \
 
 WORKDIR /code
 
-ADD pom.xml /code/pom.xml
+COPY pom.xml /code/pom.xml
 
 # Adding source, compile and package into a fat jar
-ADD src/main /code/src/main
+COPY src/main /code/src/main
 RUN mvn clean package
 
 CMD ["java", "-jar", "target/worker-jar-with-dependencies.jar"]

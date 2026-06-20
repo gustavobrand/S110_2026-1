@@ -1,0 +1,48 @@
+name: Lab VoteApp IaC Static
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lab-voteapp-terraform/infra/**'
+      - '.github/workflows/lab-voteapp-iac-static.yml'
+  pull_request:
+    paths:
+      - 'lab-voteapp-terraform/infra/**'
+      - '.github/workflows/lab-voteapp-iac-static.yml'
+
+jobs:
+  terraform-static-checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lab-voteapp-terraform/infra
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform fmt (recursive)
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: Init TFLint
+        run: tflint --init
+
+      - name: Run TFLint
+        run: tflint --chdir .
+
+      - name: Run tfsec
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: lab-voteapp-terraform/infra

@@ -1,0 +1,186 @@
+{
+  "version": 4,
+  "terraform_version": "1.15.5",
+  "serial": 47,
+  "lineage": "51873849-e3dc-f1f4-eeff-09bd8a0bb316",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "k3d_cluster",
+      "name": "voteapp",
+      "provider": "provider[\"registry.terraform.io/pvotal-tech/k3d\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "agents": 2,
+            "credentials": [
+              {
+                "client_certificate": "-----BEGIN CERTIFICATE-----\nMIIBkTCCATegAwIBAgIIQlqsI0pIiYcwCgYIKoZIzj0EAwIwIzEhMB8GA1UEAwwY\nazNzLWNsaWVudC1jYUAxNzgwNTA2OTQxMB4XDTI2MDYwMzE3MTU0MVoXDTI3MDYw\nMzE3MTU0MVowMDEXMBUGA1UEChMOc3lzdGVtOm1hc3RlcnMxFTATBgNVBAMTDHN5\nc3RlbTphZG1pbjBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOSQpyhYpI17fHWQ\nvPtKeldHemxJpbYxZXwld+H14gaaNiXJkPvG5QXuZxeLxZTAe0DUbO9hJMH0RIBC\nxU/j5PqjSDBGMA4GA1UdDwEB/wQEAwIFoDATBgNVHSUEDDAKBggrBgEFBQcDAjAf\nBgNVHSMEGDAWgBQa7rQxd42dQalikeQvje0DkWOKeDAKBggqhkjOPQQDAgNIADBF\nAiEA+mPuIA4EJV4okAMTOpzHVNMFEi0qMCOSs6K01lYQk6sCICa64OfCzb/VPgyU\nbLR8QIE7apOCRMOt0cNbCRJfExV2\n-----END CERTIFICATE-----\n-----BEGIN CERTIFICATE-----\nMIIBdzCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3MtY2xp\nZW50LWNhQDE3ODA1MDY5NDEwHhcNMjYwNjAzMTcxNTQxWhcNMzYwNTMxMTcxNTQx\nWjAjMSEwHwYDVQQDDBhrM3MtY2xpZW50LWNhQDE3ODA1MDY5NDEwWTATBgcqhkjO\nPQIBBggqhkjOPQMBBwNCAATQEvHrW7AyfXFIc+Q8x1wKzSA4HrrEQiSsnP4iivwg\n+Gl80QiBXCijdQAYWlriRYPTRbqj0GhK/zbzY4uKG2QZo0IwQDAOBgNVHQ8BAf8E\nBAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUGu60MXeNnUGpYpHkL43t\nA5FjingwCgYIKoZIzj0EAwIDSAAwRQIgeZ1IDicEZqfdXajxtCDV603lBhAabUxR\nRebW9rjQsjoCIQCKZ8Gnte3p+iU+9/QXhTEviLoJxTfPZF3lv4OKgB9oLQ==\n-----END CERTIFICATE-----\n",
+                "client_key": "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIBBQbTLGm4lk1AIeT9rldHg/bhDb1JNgf/oov7mxqv0yoAoGCCqGSM49\nAwEHoUQDQgAE5JCnKFikjXt8dZC8+0p6V0d6bEmltjFlfCV34fXiBpo2JcmQ+8bl\nBe5nF4vFlMB7QNRs72EkwfREgELFT+Pk+g==\n-----END EC PRIVATE KEY-----\n",
+                "cluster_ca_certificate": "-----BEGIN CERTIFICATE-----\nMIIBeDCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy\ndmVyLWNhQDE3ODA1MDY5NDEwHhcNMjYwNjAzMTcxNTQxWhcNMzYwNTMxMTcxNTQx\nWjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3ODA1MDY5NDEwWTATBgcqhkjO\nPQIBBggqhkjOPQMBBwNCAARG/Ii2cDQ+YXrrvVsh3NFFApIdjk6s73z7d2cc53Jl\nlsozWbthGouB+e2oltS2NQldjnC2MZ90PiEZtnVpQb2oo0IwQDAOBgNVHQ8BAf8E\nBAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUgdqh01Pt+yQIDLEY0151\nkdLfDtIwCgYIKoZIzj0EAwIDSQAwRgIhAKUroPWncJ38jplLQtM8sn4sDSHz1g/S\nJS64bk47DdwgAiEAunkTeMALO2KHZcJmJWtZ7/zDteiCVtfoVF1RHdgncn8=\n-----END CERTIFICATE-----\n",
+                "host": "https://0.0.0.0:41181",
+                "raw": "apiVersion: v1\nclusters:\n- cluster:\n    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJlRENDQVIyZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQWpNU0V3SHdZRFZRUUREQmhyTTNNdGMyVnkKZG1WeUxXTmhRREUzT0RBMU1EWTVOREV3SGhjTk1qWXdOakF6TVRjeE5UUXhXaGNOTXpZd05UTXhNVGN4TlRReApXakFqTVNFd0h3WURWUVFEREJock0zTXRjMlZ5ZG1WeUxXTmhRREUzT0RBMU1EWTVOREV3V1RBVEJnY3Foa2pPClBRSUJCZ2dxaGtqT1BRTUJCd05DQUFSRy9JaTJjRFErWVhycnZWc2gzTkZGQXBJZGprNnM3M3o3ZDJjYzUzSmwKbHNveldidGhHb3VCK2Uyb2x0UzJOUWxkam5DMk1aOTBQaUVadG5WcFFiMm9vMEl3UURBT0JnTlZIUThCQWY4RQpCQU1DQXFRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVWdkcWgwMVB0K3lRSURMRVkwMTUxCmtkTGZEdEl3Q2dZSUtvWkl6ajBFQXdJRFNRQXdSZ0loQUtVcm9QV25jSjM4anBsTFF0TThzbjRzRFNIejFnL1MKSlM2NGJrNDdEZHdnQWlFQXVua1RlTUFMTzJLSFpjSm1KV3RaNy96RHRlaUNWdGZvVkYxUkhkZ25jbjg9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K\n    server: https://0.0.0.0:41181\n  name: k3d-voteapp\ncontexts:\n- context:\n    cluster: k3d-voteapp\n    user: admin@k3d-voteapp\n  name: k3d-voteapp\ncurrent-context: k3d-voteapp\nkind: Config\npreferences: {}\nusers:\n- name: admin@k3d-voteapp\n  user:\n    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJrVENDQVRlZ0F3SUJBZ0lJUWxxc0kwcElpWWN3Q2dZSUtvWkl6ajBFQXdJd0l6RWhNQjhHQTFVRUF3d1kKYXpOekxXTnNhV1Z1ZEMxallVQXhOemd3TlRBMk9UUXhNQjRYRFRJMk1EWXdNekUzTVRVME1Wb1hEVEkzTURZdwpNekUzTVRVME1Wb3dNREVYTUJVR0ExVUVDaE1PYzNsemRHVnRPbTFoYzNSbGNuTXhGVEFUQmdOVkJBTVRESE41CmMzUmxiVHBoWkcxcGJqQlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJPU1FweWhZcEkxN2ZIV1EKdlB0S2VsZEhlbXhKcGJZeFpYd2xkK0gxNGdhYU5pWEprUHZHNVFYdVp4ZUx4WlRBZTBEVWJPOWhKTUgwUklCQwp4VS9qNVBxalNEQkdNQTRHQTFVZER3RUIvd1FFQXdJRm9EQVRCZ05WSFNVRUREQUtCZ2dyQmdFRkJRY0RBakFmCkJnTlZIU01FR0RBV2dCUWE3clF4ZDQyZFFhbGlrZVF2amUwRGtXT0tlREFLQmdncWhrak9QUVFEQWdOSUFEQkYKQWlFQSttUHVJQTRFSlY0b2tBTVRPcHpIVk5NRkVpMHFNQ09TczZLMDFsWVFrNnNDSUNhNjRPZkN6Yi9WUGd5VQpiTFI4UUlFN2FwT0NSTU90MGNOYkNSSmZFeFYyCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0KLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJkekNDQVIyZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQWpNU0V3SHdZRFZRUUREQmhyTTNNdFkyeHAKWlc1MExXTmhRREUzT0RBMU1EWTVOREV3SGhjTk1qWXdOakF6TVRjeE5UUXhXaGNOTXpZd05UTXhNVGN4TlRReApXakFqTVNFd0h3WURWUVFEREJock0zTXRZMnhwWlc1MExXTmhRREUzT0RBMU1EWTVOREV3V1RBVEJnY3Foa2pPClBRSUJCZ2dxaGtqT1BRTUJCd05DQUFUUUV2SHJXN0F5ZlhGSWMrUTh4MXdLelNBNEhyckVRaVNzblA0aWl2d2cKK0dsODBRaUJYQ2lqZFFBWVdscmlSWVBUUmJxajBHaEsvemJ6WTR1S0cyUVpvMEl3UURBT0JnTlZIUThCQWY4RQpCQU1DQXFRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVUd1NjBNWGVOblVHcFlwSGtMNDN0CkE1Rmppbmd3Q2dZSUtvWkl6ajBFQXdJRFNBQXdSUUlnZVoxSURpY0VacWZkWGFqeHRDRFY2MDNsQmhBYWJVeFIKUmViVzlyalFzam9DSVFDS1o4R250ZTNwK2lVKzkvUVhoVEV2aUxvSnhUZlBaRjNsdjRPS2dCOW9MUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K\n    client-key-data: LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUJCUWJUTEdtNGxrMUFJZVQ5cmxkSGcvYmhEYjFKTmdmL29vdjdteHF2MHlvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFNUpDbktGaWtqWHQ4ZFpDOCswcDZWMGQ2YkVtbHRqRmxmQ1YzNGZYaUJwbzJKY21RKzhibApCZTVuRjR2RmxNQjdRTlJzNzJFa3dmUkVnRUxGVCtQaytnPT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo=\n"
+              }
+            ],
+            "env": [],
+            "id": "voteapp",
+            "image": "rancher/k3s:v1.29.6-k3s2",
+            "k3d": [],
+            "k3s": [
+              {
+                "extra_args": [
+                  {
+                    "arg": "--disable=traefik",
+                    "node_filters": [
+                      "server:*"
+                    ]
+                  },
+                  {
+                    "arg": "--disable=servicelb",
+                    "node_filters": [
+                      "server:*"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "kube_api": [],
+            "kubeconfig": [
+              {
+                "switch_current_context": true,
+                "update_default_kubeconfig": true
+              }
+            ],
+            "label": [],
+            "name": "voteapp",
+            "network": "k3d-voteapp",
+            "port": [
+              {
+                "container_port": 80,
+                "host": "",
+                "host_port": 80,
+                "node_filters": [
+                  "loadbalancer"
+                ],
+                "protocol": ""
+              },
+              {
+                "container_port": 443,
+                "host": "",
+                "host_port": 443,
+                "node_filters": [
+                  "loadbalancer"
+                ],
+                "protocol": ""
+              }
+            ],
+            "registries": [],
+            "runtime": [],
+            "servers": 1,
+            "token": "GnfQPKsjbLmllHOJWibJ",
+            "volume": []
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "credentials"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "token"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "kubernetes_namespace",
+      "name": "monitoring",
+      "provider": "provider[\"registry.terraform.io/hashicorp/kubernetes\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "id": "monitoring",
+            "metadata": [
+              {
+                "annotations": null,
+                "generate_name": "",
+                "generation": 0,
+                "labels": null,
+                "name": "monitoring",
+                "resource_version": "467",
+                "uid": "3ac5d60e-3451-497f-95a3-2bd51136f3da"
+              }
+            ],
+            "timeouts": null,
+            "wait_for_default_service_account": false
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 1,
+          "identity": {
+            "api_version": "v1",
+            "kind": "Namespace",
+            "name": "monitoring"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjozMDAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "k3d_cluster.voteapp"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "kubernetes_namespace",
+      "name": "voteapp",
+      "provider": "provider[\"registry.terraform.io/hashicorp/kubernetes\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "id": "voteapp",
+            "metadata": [
+              {
+                "annotations": null,
+                "generate_name": "",
+                "generation": 0,
+                "labels": {
+                  "app": "vote-application"
+                },
+                "name": "voteapp",
+                "resource_version": "469",
+                "uid": "4b511bc1-b45b-4821-aa81-9f6bc7ee50f7"
+              }
+            ],
+            "timeouts": null,
+            "wait_for_default_service_account": false
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 1,
+          "identity": {
+            "api_version": "v1",
+            "kind": "Namespace",
+            "name": "voteapp"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjozMDAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "k3d_cluster.voteapp"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

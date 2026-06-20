@@ -4,6 +4,7 @@ var express = require('express'),
     cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser'),
     methodOverride = require('method-override'),
+  path = require('path'),
     app = express(),
     server = require('http').Server(app),
     io = require('socket.io')(server);

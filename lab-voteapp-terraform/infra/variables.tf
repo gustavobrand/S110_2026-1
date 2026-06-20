@@ -23,13 +23,6 @@ variable "create_namespaces" {
   description = "Cria namespaces Kubernetes para os recursos da aplicacao"
 }
 
-variable "kubeconfig_context" {
-  type        = string
-  default     = null
-  nullable    = true
-  description = "Contexto do kubeconfig (ex.: k3d-voteapp). Se null, usa k3d-<cluster_name>"
-}
-
 # ── Postgres ────────────────────────────────────────────────
 variable "postgres_db" {
   type        = string
@@ -60,31 +53,6 @@ variable "postgres_storage_class" {
   default     = null
   nullable    = true
   description = "StorageClass usada pelo PVC do Postgres (null = classe padrao do cluster)"
-}
-
-# ── Aplicação ───────────────────────────────────────────────
-variable "vote_replicas" {
-  type        = number
-  default     = 2
-  description = "Número de réplicas do serviço vote"
-}
-
-variable "vote_image" {
-  type        = string
-  default     = "dockersamples/examplevotingapp_vote"
-  description = "Imagem Docker do serviço vote"
-}
-
-variable "result_image" {
-  type        = string
-  default     = "dockersamples/examplevotingapp_result"
-  description = "Imagem Docker do serviço result"
-}
-
-variable "worker_image" {
-  type        = string
-  default     = "dockersamples/examplevotingapp_worker"
-  description = "Imagem Docker do worker"
 }
 
 # ── Monitoramento ───────────────────────────────────────────
