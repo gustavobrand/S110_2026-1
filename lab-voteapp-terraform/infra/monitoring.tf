@@ -10,5 +10,10 @@ resource "helm_release" "kube_prometheus_stack" {
     value = var.grafana_password
   }
 
+  set {
+    name  = "nodeExporter.enabled"
+    value = false
+  }
+
   depends_on = [kubernetes_namespace.monitoring]
 }
