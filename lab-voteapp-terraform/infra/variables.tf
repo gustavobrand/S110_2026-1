@@ -68,3 +68,21 @@ variable "prometheus_chart_version" {
   default     = "55.0.0"
   description = "Versão do chart kube-prometheus-stack"
 }
+
+variable "create_voteapp_monitoring" {
+  type        = bool
+  default     = true
+  description = "Se true, cria ServiceMonitors para os serviços vote e result"
+}
+
+variable "vote_image" {
+  type        = string
+  default     = "dockersamples/examplevotingapp_vote"
+  description = "Imagem do serviço vote"
+}
+
+variable "result_image" {
+  type        = string
+  default     = "dockersamples/examplevotingapp_result"
+  description = "Imagem do serviço result"
+}

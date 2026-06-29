@@ -1,6 +1,7 @@
 var express = require('express'),
     async = require('async'),
     pg = require("pg"),
+    client = require('prom-client'),
     cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser'),
     methodOverride = require('method-override'),
@@ -10,6 +11,14 @@ var express = require('express'),
     io = require('socket.io')(server);
 
 io.set('transports', ['polling']);
+
+var register = new client.Registry();
+var requestCounter = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total HTTP requests processed by the service',
+  labelNames: ['service', 'method', 'path', 'status'],
+  registers: [register]
+});
 
 var port = process.env.PORT || 4000;
 
@@ -72,6 +81,17 @@ app.use(cookieParser());
 app.use(bodyParser());
 app.use(methodOverride('X-HTTP-Method-Override'));
 app.use(function(req, res, next) {
+  res.on('finish', function() {
+    requestCounter.inc({
+      service: 'result',
+      method: req.method,
+      path: req.path,
+      status: String(res.statusCode)
+    });
+  });
+  next();
+});
+app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
@@ -82,6 +102,11 @@ app.use(express.static(__dirname + '/views'));
 
 app.get('/', function (req, res) {
   res.sendFile(path.resolve(__dirname + '/views/index.html'));
+});
+
+app.get('/metrics', async function (req, res) {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
 });
 
 server.listen(port, function () {

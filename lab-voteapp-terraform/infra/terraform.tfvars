@@ -6,3 +6,5 @@ grafana_password         = "admin123"
 prometheus_chart_version = "86.1.1"
 postgres_use_pvc         = false
 create_db_bootstrap_job  = false
+vote_image               = "app-vote:latest"
+result_image             = "app-result:latest"
