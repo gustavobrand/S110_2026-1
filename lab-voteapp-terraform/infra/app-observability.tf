@@ -25,8 +25,8 @@ resource "kubernetes_deployment_v1" "vote" {
 
       spec {
         container {
-          name  = "vote"
-          image = var.vote_image
+          name              = "vote"
+          image             = var.vote_image
           image_pull_policy = "IfNotPresent"
 
           port {
@@ -117,8 +117,8 @@ resource "kubernetes_deployment_v1" "result" {
 
       spec {
         container {
-          name  = "result"
-          image = var.result_image
+          name              = "result"
+          image             = var.result_image
           image_pull_policy = "IfNotPresent"
 
           port {

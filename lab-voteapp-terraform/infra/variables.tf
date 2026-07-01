@@ -75,6 +75,30 @@ variable "create_voteapp_monitoring" {
   description = "Se true, cria ServiceMonitors para os serviços vote e result"
 }
 
+variable "create_loki_stack" {
+  type        = bool
+  default     = true
+  description = "Se true, instala Loki + Promtail no namespace monitoring"
+}
+
+variable "loki_stack_chart_version" {
+  type        = string
+  default     = "2.10.2"
+  description = "Versão do chart loki-stack"
+}
+
+variable "create_jaeger" {
+  type        = bool
+  default     = true
+  description = "Se true, cria Jaeger all-in-one no namespace monitoring"
+}
+
+variable "jaeger_image" {
+  type        = string
+  default     = "jaegertracing/all-in-one:1.57"
+  description = "Imagem do Jaeger all-in-one"
+}
+
 variable "enable_voteapp_service_monitor_manifests" {
   type        = bool
   default     = false
