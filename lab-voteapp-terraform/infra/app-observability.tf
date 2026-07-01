@@ -162,6 +162,58 @@ resource "kubernetes_service_v1" "result" {
   depends_on = [kubernetes_deployment_v1.result]
 }
 
+resource "kubernetes_deployment_v1" "worker" {
+  metadata {
+    name      = "worker"
+    namespace = "voteapp"
+    labels = {
+      app = "worker"
+    }
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "worker"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "worker"
+        }
+      }
+
+      spec {
+        container {
+          name              = "worker"
+          image             = var.worker_image
+          image_pull_policy = "IfNotPresent"
+
+          env {
+            name  = "REDIS_HOST"
+            value = "redis"
+          }
+
+          env {
+            name  = "DB_HOST"
+            value = "db"
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [
+    kubernetes_namespace.voteapp,
+    kubernetes_deployment_v1.redis,
+    kubernetes_deployment_v1.db
+  ]
+}
+
 resource "kubernetes_manifest" "vote_service_monitor" {
   count = var.create_voteapp_monitoring && var.enable_voteapp_service_monitor_manifests ? 1 : 0
 

@@ -8,5 +8,6 @@ postgres_use_pvc         = false
 create_db_bootstrap_job  = false
 vote_image               = "app-vote:latest"
 result_image             = "app-result:latest"
+worker_image             = "app-worker:latest"
 # Segunda etapa: habilite como true apos cluster + kube-prometheus-stack estarem criados.
 enable_voteapp_service_monitor_manifests = false

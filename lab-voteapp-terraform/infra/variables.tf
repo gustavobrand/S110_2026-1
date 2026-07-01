@@ -92,3 +92,9 @@ variable "result_image" {
   default     = "dockersamples/examplevotingapp_result"
   description = "Imagem do serviço result"
 }
+
+variable "worker_image" {
+  type        = string
+  default     = "dockersamples/examplevotingapp_worker"
+  description = "Imagem do serviço worker"
+}
