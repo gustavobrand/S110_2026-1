@@ -27,6 +27,7 @@ resource "kubernetes_deployment_v1" "vote" {
         container {
           name  = "vote"
           image = var.vote_image
+          image_pull_policy = "IfNotPresent"
 
           port {
             name           = "http"
@@ -118,6 +119,7 @@ resource "kubernetes_deployment_v1" "result" {
         container {
           name  = "result"
           image = var.result_image
+          image_pull_policy = "IfNotPresent"
 
           port {
             name           = "http"
