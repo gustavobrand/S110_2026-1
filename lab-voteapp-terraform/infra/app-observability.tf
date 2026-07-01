@@ -161,7 +161,7 @@ resource "kubernetes_service_v1" "result" {
 }
 
 resource "kubernetes_manifest" "vote_service_monitor" {
-  count = var.create_voteapp_monitoring ? 1 : 0
+  count = var.create_voteapp_monitoring && var.enable_voteapp_service_monitor_manifests ? 1 : 0
 
   manifest = {
     apiVersion = "monitoring.coreos.com/v1"
@@ -199,7 +199,7 @@ resource "kubernetes_manifest" "vote_service_monitor" {
 }
 
 resource "kubernetes_manifest" "result_service_monitor" {
-  count = var.create_voteapp_monitoring ? 1 : 0
+  count = var.create_voteapp_monitoring && var.enable_voteapp_service_monitor_manifests ? 1 : 0
 
   manifest = {
     apiVersion = "monitoring.coreos.com/v1"

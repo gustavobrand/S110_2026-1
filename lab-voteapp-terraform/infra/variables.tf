@@ -75,6 +75,12 @@ variable "create_voteapp_monitoring" {
   description = "Se true, cria ServiceMonitors para os serviços vote e result"
 }
 
+variable "enable_voteapp_service_monitor_manifests" {
+  type        = bool
+  default     = false
+  description = "Habilita criacao dos ServiceMonitors em segunda etapa, apos cluster e stack de monitoramento estarem ativos"
+}
+
 variable "vote_image" {
   type        = string
   default     = "dockersamples/examplevotingapp_vote"
