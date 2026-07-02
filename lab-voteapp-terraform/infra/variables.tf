@@ -68,3 +68,57 @@ variable "prometheus_chart_version" {
   default     = "55.0.0"
   description = "Versão do chart kube-prometheus-stack"
 }
+
+variable "create_voteapp_monitoring" {
+  type        = bool
+  default     = true
+  description = "Se true, cria ServiceMonitors para os serviços vote e result"
+}
+
+variable "create_loki_stack" {
+  type        = bool
+  default     = true
+  description = "Se true, instala Loki + Promtail no namespace monitoring"
+}
+
+variable "loki_stack_chart_version" {
+  type        = string
+  default     = "2.10.2"
+  description = "Versão do chart loki-stack"
+}
+
+variable "create_jaeger" {
+  type        = bool
+  default     = true
+  description = "Se true, cria Jaeger all-in-one no namespace monitoring"
+}
+
+variable "jaeger_image" {
+  type        = string
+  default     = "jaegertracing/all-in-one:1.57"
+  description = "Imagem do Jaeger all-in-one"
+}
+
+variable "enable_voteapp_service_monitor_manifests" {
+  type        = bool
+  default     = false
+  description = "Habilita criacao dos ServiceMonitors em segunda etapa, apos cluster e stack de monitoramento estarem ativos"
+}
+
+variable "vote_image" {
+  type        = string
+  default     = "dockersamples/examplevotingapp_vote"
+  description = "Imagem do serviço vote"
+}
+
+variable "result_image" {
+  type        = string
+  default     = "dockersamples/examplevotingapp_result"
+  description = "Imagem do serviço result"
+}
+
+variable "worker_image" {
+  type        = string
+  default     = "dockersamples/examplevotingapp_worker"
+  description = "Imagem do serviço worker"
+}

@@ -1,0 +1,7 @@
+Disparar tragefo simulado:
+ python3 /workspaces/S110_2026-1/lab-voteapp-terraform/app/random_vote_traffic.py --url http://vote.local/ --rate 2 --duration 300 --p-a 0.3
+
+Mapear as portas do 9090 e 3000:
+ kubectl -n monitoring port-forward svc/kube-prometheus-stack-prometheus 9090:9090
+ kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80
+

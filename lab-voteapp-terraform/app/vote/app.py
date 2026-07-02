@@ -4,12 +4,19 @@ import os
 import socket
 import random
 import json
+from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
 
 option_a = os.getenv('OPTION_A', "Python")
 option_b = os.getenv('OPTION_B', "Javascript")
 hostname = socket.gethostname()
 
 app = Flask(__name__)
+
+REQUEST_COUNTER = Counter(
+    'http_requests_total',
+    'Total HTTP requests processed by the service',
+    ['service', 'method', 'path', 'status']
+)
 
 def get_redis():
     if not hasattr(g, 'redis'):
@@ -39,6 +46,22 @@ def hello():
     ))
     resp.set_cookie('voter_id', voter_id)
     return resp
+
+
+@app.route('/metrics', methods=['GET'])
+def metrics():
+    return app.response_class(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
+
+
+@app.after_request
+def count_http_requests(response):
+    REQUEST_COUNTER.labels(
+        service='vote',
+        method=request.method,
+        path=request.path,
+        status=str(response.status_code),
+    ).inc()
+    return response
 
 
 if __name__ == "__main__":
